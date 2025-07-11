@@ -5,10 +5,14 @@
 
 # Installing stow
 
+```bash
 pacman -Ss stow
+```
 
 # Version control using git:
 
 install git
 
+```
 sudo pacman -S git
+```
