@@ -1,6 +1,7 @@
 # Tutorial for GNU STOW:
 
-https://www.youtube.com/watch?v=y6XCebnB9gs
+[STOW Tutorial on YouTube](https://www.youtube.com/watch?v=y6XCebnB9gs)
+
 
 # Installing stow
 
