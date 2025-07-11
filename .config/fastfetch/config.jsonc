@@ -8,12 +8,14 @@
     "kernel",
     "uptime",
     "packages",
-    "terminal",
+    "shell",
     "cpu",
     "gpu",
     "memory",
     "swap",
     "disk",
     "localip",
+    "battery",
+    "poweradapter"
   ]
 }
