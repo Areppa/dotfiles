@@ -1,11 +1,33 @@
 {
   "position": "top",
-  "modules-left": ["hyprland/workspaces"],
-  "modules-center": ["hyprland/window"],
-  "modules-right": ["network", "pulseaudio", "battery", "clock"],
+  "height": 25,
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
+  "modules-center": ["clock"],
+  "modules-right": [
+        "tray",
+        "pulseaudio",
+        "cpu",
+        "memory",
+        "network",
+        "battery"
+    ],
   "clock": {
     "format": "<span foreground='#f5c2e7'>   </span>{:%a %d %H:%M}",
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt> "
+  },
+  "cpu": {
+    "format": "CPU {}%"
+  },
+  "memory": {
+    "format": "RAM {used} GiB"
+  },
+  "tray": {
+        "spacing": 10
+  },
+  "hyprland/workspaces": {
+         "disable-scroll": true,
+         "all-outputs": false,
+         "warp-on-scroll": false
   },
   "battery": {
     "states": {
@@ -23,11 +45,12 @@
     "tooltip-format": "{time}"
   },
   "network": {
-    "format-wifi": "<span size='13000' foreground='#f5e0dc'>  </span>{essid}",
-    "format-ethernet": "<span size='13000' foreground='#f5e0dc'>󰤭  </span> Disconnected",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "<span size='13000' foreground='#f5e0dc'>  </span>Disconnected",
-    "tooltip-format-wifi": "Signal Strenght: {signalStrength}%"
+        "format-wifi": "{essid} ({signalStrength}%) ",
+        "format-ethernet": "",
+        "tooltip-format": "{ifname} via {gwaddr} ",
+        "format-linked": "{ifname} (No IP) ",
+        "format-disconnected": "Disconnected ⚠",
+        "format-alt": "{ifname}: {ipaddr}/{cidr}"
   },
   "pulseaudio": {
       "format": "{icon}  {volume}%",

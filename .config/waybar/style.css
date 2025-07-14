@@ -15,7 +15,7 @@
 
 #tray{
   margin: 6px 3px;
-  background-color: rgba(36, 36, 52, 1.0);
+  background-color: rgb(136, 88, 169);
   padding: 6px 12px; /* 保持内部间距 */
   border-radius: 6px;
   border-width: 0px;
