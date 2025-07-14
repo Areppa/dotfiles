@@ -16,7 +16,7 @@
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt> "
   },
   "cpu": {
-    "format": "CPU {}%"
+    "format": "CPU {usage}%"
   },
   "memory": {
     "format": "RAM {used} GiB"
