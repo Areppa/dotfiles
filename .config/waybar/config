@@ -12,14 +12,16 @@
         "battery"
     ],
   "clock": {
-    "format": "<span foreground='#f5c2e7'>   </span>{:%a %d %H:%M}",
-    "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt> "
+      "interval": 60,
+      "tooltip": true,
+      "format": "{:%a %d %H:%M}",
+      "tooltip-format": "{:%d.%m.%Y\n%A, %B}"
   },
   "cpu": {
     "format": "CPU {usage}%"
   },
   "memory": {
-    "format": "RAM {used} GiB"
+    "format": "RAM {used:0.1f} GiB"
   },
   "tray": {
         "spacing": 10
