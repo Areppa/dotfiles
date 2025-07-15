@@ -5,17 +5,18 @@
   min-height: 0;
   border: none;
   font-weight: bold;
+  color: white
 }
 
 #workspaces{
-  background-color: rgba(24,24,37,1.0);
+  background-color: #181825;
   border: none;
   box-shadow: none;
 }
 
 #tray{
   margin: 6px 3px;
-  background-color: rgb(136, 88, 169);
+  background-color: rgb(128, 0, 128);
   padding: 6px 12px; /* 保持内部间距 */
   border-radius: 6px;
   border-width: 0px;
@@ -48,43 +49,56 @@
 }
 
 #clock {
-  background-color: #89b4fa;
+  background-color: #800080;
+  color: white
 }
 #custom-power{
-  background-color: #f38ba8;
+  background-color: #800080;
+  color: white
 }
 #custom-reboot{
-  background-color: #a6e3a1;
+  background-color: #800080;
+  color: white
 }
 #bluetooth{
-  background-color: #f9e2af;
+  background-color: #800080;
+  color: white
 }
 #battery{
-  background-color: #cba6f7;
+  background-color: #800080;
+  color: white
 }
 #pulseaudio{
-  background-color: #89dceb;
+  background-color: #800080;
+  color: white
 }
 #backlight{
-  background-color: #a6a3a1;
+  background-color: #800080;
+  color: white
 }
 #custom-temperature{
-  background-color: #74c7ec;
+  background-color: #800080;
+  color: white
 }
 #memory{
-  background-color: #f7768e;
+  background-color: #800080;
+  color: white
 }
 #cpu{
-  background-color: #f38ba8;
+  background-color: #800080;
+  color: white
 }
 #network{
-  background-color: #fab387;
+  background-color: #800080;
+  color: white
 }
 #custom-lock{
-  background-color: #94e2d5;
+  background-color: #800080;
+  color: white
 }
 #window{
-  background-color: #74c7ec;
+  background-color: #800080;
+  color: white
 }
 
 #waybar.hidden {
@@ -107,14 +121,14 @@
 
 #workspaces button.active {
   color: #1e1e2e;
-  background-color: #cdd6f4;
+  background-color: #800080;
 }
 
 #workspaces button:hover {
   box-shadow: inherit;
-  text-shadow: inherit;
+  text-shadow: #cdd6f4;
   color: #1e1e2e;
-  background-color: #cdd6f4;
+  background-color: #440044;
 }
 
 tooltip {
