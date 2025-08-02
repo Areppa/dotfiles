@@ -47,12 +47,13 @@
     "tooltip-format": "{time}"
   },
   "network": {
-        "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "",
-        "tooltip-format": "{ifname} via {gwaddr} ",
-        "format-linked": "{ifname} (No IP) ",
-        "format-disconnected": "Disconnected ⚠",
-        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+      "format-wifi": "{essid} ({signalStrength}%) ",
+      "format-ethernet": "",
+      "tooltip-format": "{ifname} via {gwaddr} ",
+      "format-linked": "{ifname} (No IP) ",
+      "format-disconnected": "Disconnected ⚠",
+      "format-alt": "{ifname}: {ipaddr}/{cidr}",
+      "on-click-right": "kitty nmtui"
   },
   "pulseaudio": {
       "format": "{icon}  {volume}%",
