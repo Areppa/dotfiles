@@ -1,27 +1,40 @@
 {
   "position": "top",
-  "height": 25,
-  "modules-left": ["hyprland/workspaces", "hyprland/window"],
-  "modules-center": ["clock"],
+  "height": 44,
+  "modules-left": ["hyprland/workspaces"],
+  "modules-center": ["hyprland/window"],
   "modules-right": [
         "tray",
         "pulseaudio",
         "cpu",
         "memory",
         "network",
-        "battery"
+        "battery",
+        "clock"
     ],
   "clock": {
-      "interval": 60,
+      "interval": 5,
       "tooltip": true,
       "format": "{:%a %d %H:%M}",
       "tooltip-format": "{:%d.%m.%Y\n%A, %B}"
   },
   "cpu": {
-    "format": "CPU {usage}%"
+     "interval": 5,
+     "format": "\udb80\udf5b {usage}%",
+     "format-icons": [
+          "<span color='#69ff94'>▁</span>",
+          "<span color='#2aa9ff'>▂</span>",
+          "<span color='#f8f8f2'>▃</span>",
+          "<span color='#f8f8f2'>▄</span>",
+          "<span color='#ffffa5'>▅</span>",
+          "<span color='#ffffa5'>▆</span>",
+          "<span color='#ff9977'>▇</span>",
+          "<span color='#dd532e'>█</span>" 
+     ]
   },
   "memory": {
-    "format": "RAM {used:0.1f} GiB"
+     "interval": 5,
+    "format": "\uefc5 {used:0.1f} GiB"
   },
   "tray": {
         "spacing": 10
