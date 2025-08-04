@@ -45,6 +45,7 @@
          "warp-on-scroll": false
   },
   "battery": {
+    "interval": 5,
     "states": {
       "warning": 30,
       "critical": 15
@@ -60,16 +61,16 @@
     "tooltip-format": "{time}"
   },
   "network": {
-      "format-wifi": "{essid} ({signalStrength}%) ",
+      "format-wifi": "  {signalStrength}%",
       "format-ethernet": "",
       "tooltip-format": "{ifname} via {gwaddr} ",
       "format-linked": "{ifname} (No IP) ",
       "format-disconnected": "Disconnected ⚠",
-      "format-alt": "{ifname}: {ipaddr}/{cidr}",
+      "format-alt": "{ifname}/{essid}: {ipaddr}/{cidr}",
       "on-click-right": "kitty nmtui"
   },
   "pulseaudio": {
-      "format": "{icon}  {volume}%",
+      "format": "{icon} {volume}%",
       "format-muted": "",
       "format-icons": {
           "default": ["", "", " "]
