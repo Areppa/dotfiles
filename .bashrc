@@ -163,8 +163,10 @@ alias .....='cd ../../../..'
 # cd into the old directory
 alias bd='cd "$OLDPWD"'
 
-# aliases for multiple directory listing commands
-alias ls='eza -l --group-directories-first --git'
+# Check if eza is installed and set alias accordingly
+if command -v eza &> /dev/null; then
+    alias ls='eza -l --group-directories-first --git'
+fi
 
 # alias chmod commands
 alias mx='chmod a+x'
