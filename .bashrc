@@ -140,11 +140,6 @@ alias da='date "+%Y-%m-%d %A %T %Z"'
 # aliases to modified commands
 alias cp='cp -i'
 alias mv='mv -i'
-if command -v trash &> /dev/null; then
-    alias rm='trash -v'
-else
-    alias rm='rm -i'  # fallback to interactive remove
-fi
 alias mkdir='mkdir -p'
 alias ps='ps auxf'
 alias less='less -R'
@@ -168,27 +163,8 @@ alias .....='cd ../../../..'
 # cd into the old directory
 alias bd='cd "$OLDPWD"'
 
-# Remove a directory and all files
-alias rmd='/bin/rm  --recursive --force --verbose '
-
 # aliases for multiple directory listing commands
-alias la='ls -Alh'                # show hidden files
-alias ls='ls -aFh --color=always' # add colors and file type extensions
-alias lx='ls -lXBh'               # sort by extension
-alias lk='ls -lSrh'               # sort by size
-alias lc='ls -ltcrh'              # sort by change time
-alias lu='ls -lturh'              # sort by access time
-alias lr='ls -lRh'                # recursive ls
-alias lt='ls -ltrh'               # sort by date
-alias lm='ls -alh |more'          # pipe through 'more'
-alias lw='ls -xAh'                # wide listing format
-alias ll='ls -Fls'                # long listing format
-alias labc='ls -lap'              # alphabetical sort
-alias lf="ls -l | egrep -v '^d'"  # files only
-alias ldir="ls -l | egrep '^d'"   # directories only
-alias lla='ls -Al'                # List and Hidden Files
-alias las='ls -A'                 # Hidden Files
-alias lls='ls -l'                 # List
+alias ls='eza -l --group-directories-first --git'
 
 # alias chmod commands
 alias mx='chmod a+x'
@@ -252,10 +228,10 @@ alias kssh="kitty +kitten ssh"
 # alias to cleanup unused docker containers, images, networks, and volumes
 
 alias docker-clean=' \
-  docker container prune -f ; \
-  docker image prune -f ; \
-  docker network prune -f ; \
-  docker volume prune -f '
+  sudo docker container prune -f ; \
+  sudo docker image prune -f ; \
+  sudo docker network prune -f ; \
+  sudo docker volume prune -f '
 
 #######################################################
 # SPECIAL FUNCTIONS
@@ -530,105 +506,12 @@ function whatsmyip () {
     curl -s ifconfig.me
 }
 
-# View Apache logs
-apachelog() {
-	if [ -f /etc/httpd/conf/httpd.conf ]; then
-		cd /var/log/httpd && ls -xAh && multitail --no-repeat -c -s 2 /var/log/httpd/*_log
-	else
-		cd /var/log/apache2 && ls -xAh && multitail --no-repeat -c -s 2 /var/log/apache2/*.log
-	fi
-}
-
-# Edit the Apache configuration
-apacheconfig() {
-	if [ -f /etc/httpd/conf/httpd.conf ]; then
-		sedit /etc/httpd/conf/httpd.conf
-	elif [ -f /etc/apache2/apache2.conf ]; then
-		sedit /etc/apache2/apache2.conf
-	else
-		echo "Error: Apache config file could not be found."
-		echo "Searching for possible locations:"
-		sudo updatedb && locate httpd.conf && locate apache2.conf
-	fi
-}
-
-# Edit the PHP configuration file
-phpconfig() {
-	if [ -f /etc/php.ini ]; then
-		sedit /etc/php.ini
-	elif [ -f /etc/php/php.ini ]; then
-		sedit /etc/php/php.ini
-	elif [ -f /etc/php5/php.ini ]; then
-		sedit /etc/php5/php.ini
-	elif [ -f /usr/bin/php5/bin/php.ini ]; then
-		sedit /usr/bin/php5/bin/php.ini
-	elif [ -f /etc/php5/apache2/php.ini ]; then
-		sedit /etc/php5/apache2/php.ini
-	else
-		echo "Error: php.ini file could not be found."
-		echo "Searching for possible locations:"
-		sudo updatedb && locate php.ini
-	fi
-}
-
-# Edit the MySQL configuration file
-mysqlconfig() {
-	if [ -f /etc/my.cnf ]; then
-		sedit /etc/my.cnf
-	elif [ -f /etc/mysql/my.cnf ]; then
-		sedit /etc/mysql/my.cnf
-	elif [ -f /usr/local/etc/my.cnf ]; then
-		sedit /usr/local/etc/my.cnf
-	elif [ -f /usr/bin/mysql/my.cnf ]; then
-		sedit /usr/bin/mysql/my.cnf
-	elif [ -f ~/my.cnf ]; then
-		sedit ~/my.cnf
-	elif [ -f ~/.my.cnf ]; then
-		sedit ~/.my.cnf
-	else
-		echo "Error: my.cnf file could not be found."
-		echo "Searching for possible locations:"
-		sudo updatedb && locate my.cnf
-	fi
-}
-
-
 # Trim leading and trailing spaces (for scripts)
 trim() {
 	local var=$*
 	var="${var#"${var%%[![:space:]]*}"}" # remove leading whitespace characters
 	var="${var%"${var##*[![:space:]]}"}" # remove trailing whitespace characters
 	echo -n "$var"
-}
-# GitHub Titus Additions
-
-gcom() {
-	git add .
-	git commit -m "$1"
-}
-lazyg() {
-	git add .
-	git commit -m "$1"
-	git push
-}
-
-function hb {
-    if [ $# -eq 0 ]; then
-        echo "No file path specified."
-        return
-    elif [ ! -f "$1" ]; then
-        echo "File path does not exist."
-        return
-    fi
-
-    uri="http://bin.christitus.com/documents"
-    response=$(curl -s -X POST -d @"$1" "$uri")
-    if [ $? -eq 0 ]; then
-        hasteKey=$(echo $response | jq -r '.key')
-        echo "http://bin.christitus.com/$hasteKey"
-    else
-        echo "Failed to upload the document."
-    fi
 }
 
 #######################################################
