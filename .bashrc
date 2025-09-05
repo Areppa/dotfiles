@@ -195,6 +195,10 @@ alias checkcommand="type -t"
 # Show open ports
 alias openports='netstat -nape --inet'
 
+# Enable or disable tailscale
+alias tailup='sudo tailscale up'
+alias taildown='sudo tailscale down'
+
 # aliases for safe and forced reboots
 alias rebootsafe='sudo shutdown -r now'
 alias rebootforce='sudo shutdown -r -n now'
