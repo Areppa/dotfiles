@@ -168,14 +168,6 @@ if command -v eza &> /dev/null; then
     alias ls='eza -l --group-directories-first --git'
 fi
 
-# alias chmod commands
-alias mx='chmod a+x'
-alias 000='chmod -R 000'
-alias 644='chmod -R 644'
-alias 666='chmod -R 666'
-alias 755='chmod -R 755'
-alias 777='chmod -R 777'
-
 # Search command line history
 alias h="history | grep "
 
