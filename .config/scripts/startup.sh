@@ -7,4 +7,4 @@
 flatpak remove org.gnome.Mines org.gnome.Mahjongg -y
 
 # Upgrade flatpaks
-flatpak upgrade -y
+#flatpak upgrade -y
