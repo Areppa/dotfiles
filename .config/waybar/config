@@ -6,7 +6,6 @@
   "modules-right": [
         "tray",
         "pulseaudio",
-        "cpu",
         "memory",
         "network",
         "battery",
@@ -62,7 +61,7 @@
   },
   "network": {
       "format-wifi": "  {signalStrength}%",
-      "format-ethernet": "{ipaddr}",
+      "format-ethernet": "Eth",
       "tooltip-format": "{ifname} via {gwaddr} ",
       "format-linked": "{ifname} (No IP) ",
       "format-disconnected": "Disconnected ⚠",
