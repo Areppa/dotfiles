@@ -6,7 +6,6 @@
   "modules-right": [
         "tray",
         "pulseaudio",
-        "memory",
         "network",
         "battery",
         "clock"
