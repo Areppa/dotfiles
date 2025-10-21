@@ -1,17 +1,14 @@
 {
   "position": "top",
   "height": 44,
-  "modules-left": [
-        "clock"
-    ],
-  "modules-center": [
-        "hyprland/workspaces"
-    ],
+  "modules-left": ["hyprland/workspaces"],
+  "modules-center": ["hyprland/window"],
   "modules-right": [
         "tray",
         "pulseaudio",
         "network",
-        "battery"
+        "battery",
+        "clock"
     ],
   "clock": {
       "interval": 5,
