@@ -10,6 +10,7 @@
   "modules-right": [
         "tray",
         "pulseaudio",
+        "custom/tailscale",
         "network",
         "battery"
     ],
@@ -60,6 +61,13 @@
     "format-full": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
     "format-icons": ["", "", "", "", ""],
     "tooltip-format": "{time}"
+  },
+  "custom/tailscale": {
+    "exec": "~/.config/scripts/tailscale-status.sh",
+    "interval": 10,
+    "tooltip": "Tailscale VPN status",
+    "format": "{}",
+    "return-type": "text"
   },
   "network": {
       "format-wifi": " ",
