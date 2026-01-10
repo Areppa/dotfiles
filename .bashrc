@@ -231,6 +231,10 @@ alias docker-clean=' \
   sudo docker network prune -f ; \
   sudo docker volume prune -f '
 
+# toggle 2nd monitor on/off
+alias togg="~/dotfiles/.config/scripts/toggle_secondary_monitor.sh"
+alias launch="~/dotfiles/.config/scripts/game_launch.sh"
+
 #######################################################
 # SPECIAL FUNCTIONS
 #######################################################
