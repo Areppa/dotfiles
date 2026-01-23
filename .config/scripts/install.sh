@@ -54,6 +54,8 @@ GENERAL_PKGS=(
     exiftool
     eza
     flatpak
+    zip
+    yay
     fzf
     git
     grim
