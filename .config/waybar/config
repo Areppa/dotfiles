@@ -13,7 +13,9 @@
         "bluetooth",
         "custom/tailscale",
         "network",
-        "battery"
+        "battery",
+        "cpu",
+        "memory"
     ],
   "clock": {
       "interval": 5,
