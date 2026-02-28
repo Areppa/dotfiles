@@ -138,6 +138,7 @@ FLATPAK_APPS=(
     com.heroicgameslauncher.hgl
     org.filezillaproject.Filezilla
     org.localsend.localsend_app
+    org.gnome.gitlab.YaLTeR.VideoTrimmer
 )
 
 # Ensure the remote exists
