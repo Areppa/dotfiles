@@ -97,7 +97,7 @@
       "on-click": "kitty nmtui"
   },
   "pulseaudio": {
-      "format": "{icon} {volume}%",
+      "format": "{icon}",
       "format-muted": "",
       "format-icons": {
           "default": ["", "", " "]
