@@ -51,6 +51,7 @@ GENERAL_PKGS=(
     btop
     docker
     docker-compose
+    ncdu
     exiftool
     eza
     flatpak
@@ -118,6 +119,7 @@ DESKTOP_NATIVE_PKGS=(
     discord
     libreoffice-still
     steam
+    veracrypt
 )
 
 install_pacman_pkgs "${DESKTOP_NATIVE_PKGS[@]}"
@@ -134,7 +136,6 @@ FLATPAK_APPS=(
     dev.vencord.Vesktop
     md.obsidian.Obsidian
     net.ankiweb.Anki
-    org.gnome.Boxes
     com.heroicgameslauncher.hgl
     org.filezillaproject.Filezilla
     org.localsend.localsend_app
