@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Remove specific apps
-source ~/.config/scripts/startup.sh
+# Remove specific flatpaks automatically
+flatpak remove org.gnome.Mines org.gnome.Mahjongg -y
 
 # Update Flatpaks
 flatpak update -y
