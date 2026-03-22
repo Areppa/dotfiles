@@ -9,7 +9,7 @@
 # Settings:
 MON=DVI-D-1                             # Monitor to disable temporarily
 MON_CFG=1680x1050@59.95,1920x0,1        # 2nd monitor config: resolution@refresh_rate,location,scale
-TIMEOUT=30                              # Timeout if this script doesn't detect a game launch
+TIMEOUT=60                              # Timeout if this script doesn't detect a game launch
 GAME_CLASS_REGEX='^steam_app_[0-9]+$'   # Regex for the game class
 
 # Helper function to get the active window class
@@ -39,7 +39,7 @@ while (( elapsed < TIMEOUT )); do
 done
 
 # Adding a small delay for the game to launch properly
-sleep 3
+sleep 10
 
 # Enabling the second monitor
 echo "Re‑enabling $MON..."
