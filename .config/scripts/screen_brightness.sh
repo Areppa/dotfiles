@@ -24,7 +24,7 @@ fi
 BRIGHTNESS=$1
 
 # List of I2C bus numbers for connected monitors (replace with your actual I2C bus numbers)
-BUS_LIST=("3" "7")
+BUS_LIST=("2" "6")
 
 # Validate the brightness percentage
 if [ "$BRIGHTNESS" -lt 0 ] || [ "$BRIGHTNESS" -gt 100 ]; then
