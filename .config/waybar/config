@@ -39,7 +39,7 @@
   },
   "memory": {
      "interval": 5,
-    "format": "\uefc5 {used:0.1f} GiB"
+    "format": "{used:0.1f} GiB"
   },
   "tray": {
         "spacing": 10

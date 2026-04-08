@@ -8,24 +8,12 @@
   color: white
 }
 
-#workspaces{
-  background-color: #181825;
-  border: none;
-  box-shadow: none;
-}
-
-#tray{
-  margin: 6px 3px;
-  padding: 6px 12px; /* 保持内部间距 */
-  border-radius: 6px;
-  border-width: 0px;
-}
-
 #waybar {
-  background-color: #181825;
+  background-color: transparent;
   transition-property: background-color;
   transition-duration: 0.5s;
 }
+
 
 #window,
 #clock,
@@ -50,10 +38,6 @@
   color: white
 }
 
-#waybar.hidden {
-  opacity: 0.5;
-}
-
 #workspaces button {
   all: initial;
   /* Remove GTK theme values (waybar #1351) */
@@ -64,12 +48,12 @@
   padding: 6px 12px;
   margin: 6px 3px;
   border-radius: 4px;
-  background-color: rgba(36, 36, 52, 1.0);
+  background-color: rgba(36, 36, 52, 0.5);
   color: #cdd6f4;
 }
 
 #workspaces button.active {
-  padding: 6px 14px;
+  padding: 6px 12px;
   margin: 6px 3px;
 }
 
@@ -91,4 +75,12 @@ tooltip label {
   padding: 5px;
   background-color: #131822;
   color: #C0C0C0;
+}
+
+#memory {
+  margin-right: 8px;
+}
+
+#clock {
+  margin-left: 8px;
 }
