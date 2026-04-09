@@ -1,7 +1,6 @@
 * {
   font-family: "CaskaydiaCove Nerd Font", "Font Awesome 6 Free", "Font Awesome 6 Free Solid";
   font-size: 14px;
-  border-radius: 0;
   min-height: 0;
   border: none;
   font-weight: bold;
@@ -31,7 +30,7 @@
 #custom-tailscale,
 #workspaces button.active,
 #custom-lock{
-  border-radius: 4px;
+  border-radius: 10px;
   margin: 6px 3px;
   padding: 6px 12px;
   background-color: #800080;
@@ -47,7 +46,7 @@
   /* Use box-shadow instead of border so the text isn't offset */
   padding: 6px 12px;
   margin: 6px 3px;
-  border-radius: 4px;
+  border-radius: 10px;
   background-color: rgba(36, 36, 52, 0.5);
   color: #cdd6f4;
 }
@@ -65,7 +64,7 @@
 }
 
 tooltip {
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 16px;
   background-color: #131822;
   color: #C0C0C0;
