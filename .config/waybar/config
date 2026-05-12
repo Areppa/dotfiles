@@ -108,14 +108,14 @@
   },
   "custom/cpu": {
     "exec": "~/.config/waybar/scripts/stats.sh -C --cpu-threshold 50",
-    "interval": 10,
+    "interval": 5,
     "tooltip": "CPU usage",
     "format": "{}",
     "return-type": "text"
   },
   "custom/memory": {
     "exec": "~/.config/waybar/scripts/stats.sh -M --mem-threshold 50",
-    "interval": 10,
+    "interval": 5,
     "tooltip": "Memory usage",
     "format": "{}",
     "return-type": "text"
