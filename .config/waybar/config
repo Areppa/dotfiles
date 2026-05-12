@@ -2,7 +2,9 @@
   "position": "top",
   "height": 44,
   "modules-left": [
-        "clock"
+        "clock",
+        "custom/cpu",
+        "custom/memory"
     ],
   "modules-center": [
         "hyprland/workspaces"
@@ -13,9 +15,7 @@
         "bluetooth",
         "custom/tailscale",
         "network",
-        "battery",
-        "cpu",
-        "memory"
+        "battery"
     ],
     "clock": {
         "format": "{:%a %d %H:%M}",
@@ -103,6 +103,20 @@
     "exec": "~/.config/scripts/tailscale-status.sh",
     "interval": 10,
     "tooltip": "Tailscale VPN status",
+    "format": "{}",
+    "return-type": "text"
+  },
+  "custom/cpu": {
+    "exec": "~/.config/waybar/scripts/stats.sh -C --cpu-threshold 50",
+    "interval": 10,
+    "tooltip": "CPU usage",
+    "format": "{}",
+    "return-type": "text"
+  },
+  "custom/memory": {
+    "exec": "~/.config/waybar/scripts/stats.sh -M --mem-threshold 50",
+    "interval": 10,
+    "tooltip": "Memory usage",
     "format": "{}",
     "return-type": "text"
   },
