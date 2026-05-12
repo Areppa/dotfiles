@@ -114,7 +114,7 @@
     "return-type": "text"
   },
   "custom/memory": {
-    "exec": "~/.config/waybar/scripts/stats.sh -M --mem-threshold 50",
+    "exec": "~/.config/waybar/scripts/stats.sh -M --mem-threshold 80",
     "interval": 5,
     "tooltip": "Memory usage",
     "format": "{}",
