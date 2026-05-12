@@ -3,8 +3,8 @@
   "height": 44,
   "modules-left": [
         "clock",
-        "custom/cpu",
-        "custom/memory"
+        "custom/memory",
+        "custom/cpu"
     ],
   "modules-center": [
         "hyprland/workspaces"
