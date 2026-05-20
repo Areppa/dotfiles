@@ -1,15 +1,13 @@
 #!/bin/bash
 
-# Audio device indices to switch through
-audio_device_indices=(0 1)
-
-# Get the list of available audio sinks
-sinks=($(pactl list short sinks | awk '{print $2}'))
+# Get the list of available audio sinks, excluding easyeffects_sink
+sinks=($(pactl list short sinks | grep -v easyeffects_sink | awk '{print $2}'))
 
 # Get the current default sink
 current_sink=$(pactl get-default-sink)
 
 # Find the index of the current sink in the available sinks
+current_index=-1
 for i in "${!sinks[@]}"; do
     if [[ "${sinks[$i]}" == "$current_sink" ]]; then
         current_index=$i
@@ -17,11 +15,16 @@ for i in "${!sinks[@]}"; do
     fi
 done
 
-# Calculate the next index
-next_index=$(( (current_index + 1) % ${#audio_device_indices[@]} ))
+# If current sink wasn't found (e.g., it's easyeffects_sink), start from 0
+if [[ $current_index -eq -1 ]]; then
+    current_index=0
+else
+    # Calculate the next index
+    current_index=$(( (current_index + 1) % ${#sinks[@]} ))
+fi
 
-# Set the next sink as the default using the specified index
-pactl set-default-sink "${sinks[${audio_device_indices[$next_index]}]}"
+# Set the next sink as the default
+pactl set-default-sink "${sinks[$current_index]}"
 
 # Output the change
-echo "Switched to: ${sinks[${audio_device_indices[$next_index]}]}"
+echo "Switched to: ${sinks[$current_index]}"
