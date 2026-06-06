@@ -101,14 +101,14 @@
   },
   "custom/tailscale": {
     "exec": "~/.config/scripts/tailscale-status.sh",
-    "interval": 10,
+    "interval": 5,
     "tooltip": "Tailscale VPN status",
     "format": "{}",
     "return-type": "text"
   },
   "custom/cpu": {
     "exec": "~/.config/waybar/scripts/stats.sh -C --cpu-threshold 50",
-    "interval": 5,
+    "interval": 3,
     "tooltip": "CPU usage",
     "format": "{}",
     "return-type": "text"
