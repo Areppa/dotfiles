@@ -1,0 +1,12 @@
+[Unit]
+Description=PipeWire Audio Output Change Notifier
+After=pipewire.service wireplumber.service
+
+[Service]
+Type=simple
+ExecStart=~/.config/scripts/audio-notify.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target
