@@ -171,6 +171,10 @@ fi
 # Search command line history
 alias h="history | grep "
 
+# Search for dir and navigate to it
+alias nav='cd "$(find . -type d 2>/dev/null | fzf)"'
+
+
 # Search running processes
 alias p="ps aux | grep "
 alias topcpu="/bin/ps -eo pcpu,pid,user,args | sort -k 1 -r | head -10"
