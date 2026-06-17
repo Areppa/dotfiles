@@ -16,7 +16,11 @@
     "swap",
     "disk",
     "localip",
+    "separator",
     "battery",
-    "poweradapter"
+    "poweradapter",
+    "bluetooth",
+    "gamepad",
+    "Media"
   ]
 }
