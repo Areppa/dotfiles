@@ -1,142 +1,151 @@
 {
-  "position": "top",
-  "height": 44,
-  "modules-left": [
-        "clock",
-        "custom/memory",
-        "custom/cpu"
-    ],
-  "modules-center": [
-        "hyprland/workspaces"
-    ],
-  "modules-right": [
-        "tray",
-        "pulseaudio",
-        "bluetooth",
-        "custom/tailscale",
-        "network",
-        "battery"
-    ],
-    "clock": {
-        "format": "{:%a %d %H:%M}",
-        "format-alt": "{:%A, %B %d, %Y (%R)}  ",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>",
-        "calendar": {
-                    "mode"          : "month",
-                    "mode-mon-col"  : 3,
-                    "weeks-pos"     : "right",
-                    "on-scroll"     : 1,
-                    "format": {
-                              "months":     "<span color='#ffead3'><b>{}</b></span>",
-                              "days":       "<span color='#ecc6d9'><b>{}</b></span>",
-                              "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
-                              "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
-                              "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
-                              }
-                    },
-        "actions":  {
-                    "on-click-right": "mode",
-                    "on-scroll-up": "tz_up",
-                    "on-scroll-down": "tz_down",
-                    "on-scroll-up": "shift_up",
-                    "on-scroll-down": "shift_down"
-                    }
+    "position": "top",
+    "height": 44,
+    "modules-left": [
+            "clock",
+            "custom/waybar-media",
+            "custom/memory",
+            "custom/cpu"
+        ],
+    "modules-center": [
+            "hyprland/workspaces"
+        ],
+    "modules-right": [
+            "tray",
+            "pulseaudio",
+            "bluetooth",
+            "custom/tailscale",
+            "network",
+            "battery"
+        ],
+        "clock": {
+            "format": "{:%a %d %H:%M}",
+            "format-alt": "{:%A, %B %d, %Y (%R)}  ",
+            "tooltip-format": "<tt><small>{calendar}</small></tt>",
+            "calendar": {
+                        "mode"          : "month",
+                        "mode-mon-col"  : 3,
+                        "weeks-pos"     : "right",
+                        "on-scroll"     : 1,
+                        "format": {
+                                "months":     "<span color='#ffead3'><b>{}</b></span>",
+                                "days":       "<span color='#ecc6d9'><b>{}</b></span>",
+                                "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
+                                "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
+                                "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
+                                }
+                        },
+            "actions":  {
+                        "on-click-right": "mode",
+                        "on-scroll-up": "tz_up",
+                        "on-scroll-down": "tz_down",
+                        "on-scroll-up": "shift_up",
+                        "on-scroll-down": "shift_down"
+                        }
+        },
+    "cpu": {
+        "interval": 5,
+        "format": "\udb80\udf5b {usage}%",
+        "format-icons": [
+            "<span color='#69ff94'>▁</span>",
+            "<span color='#2aa9ff'>▂</span>",
+            "<span color='#f8f8f2'>▃</span>",
+            "<span color='#f8f8f2'>▄</span>",
+            "<span color='#ffffa5'>▅</span>",
+            "<span color='#ffffa5'>▆</span>",
+            "<span color='#ff9977'>▇</span>",
+            "<span color='#dd532e'>█</span>"
+        ]
     },
-  "cpu": {
-     "interval": 5,
-     "format": "\udb80\udf5b {usage}%",
-     "format-icons": [
-          "<span color='#69ff94'>▁</span>",
-          "<span color='#2aa9ff'>▂</span>",
-          "<span color='#f8f8f2'>▃</span>",
-          "<span color='#f8f8f2'>▄</span>",
-          "<span color='#ffffa5'>▅</span>",
-          "<span color='#ffffa5'>▆</span>",
-          "<span color='#ff9977'>▇</span>",
-          "<span color='#dd532e'>█</span>"
-     ]
-  },
-  "memory": {
-     "interval": 5,
-    "format": "{used:0.1f} GiB"
-  },
-  "tray": {
-        "spacing": 10
-  },
-  "hyprland/workspaces": {
-         "disable-scroll": true,
-         "all-outputs": false,
-         "warp-on-scroll": false
-  },
-  "bluetooth": {
-      // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
-      // "format": "󰂯 {status}",
-      // format-* handles every state, so default format is not necessary.
-      "format-on": "", // bt icon: 󰂯
-      "format-off": "", // bt off: 󰂲
-      "format-disabled": "", // an empty format will hide the module
-      "format-connected": "󰂱  {num_connections}",
-      "format-no-controller": "",
-      // "tooltip-format": "{controller_alias}\t{controller_address}",
-      // "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-      "tooltip-format-connected": "{device_enumerate}",
-      "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
-      "on-click": "kitty bluetui"
-  },
-  "battery": {
-    "interval": 5,
-    "on-click-right": "~/.config/scripts/powerprofile_switch.sh",
-    "states": {
-      "warning": 30,
-      "critical": 15
+    "memory": {
+        "interval": 5,
+        "format": "{used:0.1f} GiB"
     },
-    "format": "<span size='13000' foreground='#a6e3a1'>{icon} </span> {capacity}%",
-    "format-warning": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {capacity}%",
-    "format-critical": "<span size='13000' foreground='#E38C8F'>{icon} </span> {capacity}%",
-    "format-charging": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-plugged": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-alt": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {time}",
-    "format-full": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-icons": ["", "", "", "", ""],
-    "tooltip-format": "{time}"
-  },
-  "custom/tailscale": {
-    "exec": "~/.config/scripts/tailscale-status.sh",
-    "interval": 5,
-    "tooltip": "Tailscale VPN status",
-    "format": "{}",
-    "return-type": "text"
-  },
-  "custom/cpu": {
-    "exec": "~/.config/waybar/scripts/stats.sh -C --cpu-threshold 50",
-    "interval": 3,
-    "tooltip": "CPU usage",
-    "format": "{}",
-    "return-type": "text"
-  },
-  "custom/memory": {
-    "exec": "~/.config/waybar/scripts/stats.sh -M --mem-threshold 80",
-    "interval": 5,
-    "tooltip": "Memory usage",
-    "format": "{}",
-    "return-type": "text"
-  },
-  "network": {
-      "format-wifi": " ",
-      "format-ethernet": "Eth",
-      "tooltip-format": "{ifname} via {gwaddr}",
-      "format-linked": "{ifname} (No IP) ",
-      "format-disconnected": "Disconnected ⚠",
-      //"format-alt": "{ifname}/{essid}: {ipaddr}/{cidr}",
-      "on-click": "kitty nmtui"
-  },
-  "pulseaudio": {
-      "format": "{icon}",
-      "format-muted": "",
-      "format-icons": {
-          "default": ["", "", " "]
-      },
-      "on-click": "pavucontrol -t 3",
-      "tooltip-format": "{desc} at {volume}%"
-  }
+    "tray": {
+            "spacing": 10
+    },
+    "hyprland/workspaces": {
+            "disable-scroll": true,
+            "all-outputs": false,
+            "warp-on-scroll": false
+    },
+    "bluetooth": {
+        // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
+        // "format": "󰂯 {status}",
+        // format-* handles every state, so default format is not necessary.
+        "format-on": "", // bt icon: 󰂯
+        "format-off": "", // bt off: 󰂲
+        "format-disabled": "", // an empty format will hide the module
+        "format-connected": "󰂱  {num_connections}",
+        "format-no-controller": "",
+        // "tooltip-format": "{controller_alias}\t{controller_address}",
+        // "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
+        "tooltip-format-connected": "{device_enumerate}",
+        "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+        "on-click": "kitty bluetui"
+    },
+    "battery": {
+        "interval": 5,
+        "on-click-right": "~/.config/scripts/powerprofile_switch.sh",
+        "states": {
+        "warning": 30,
+        "critical": 15
+        },
+        "format": "<span size='13000' foreground='#a6e3a1'>{icon} </span> {capacity}%",
+        "format-warning": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {capacity}%",
+        "format-critical": "<span size='13000' foreground='#E38C8F'>{icon} </span> {capacity}%",
+        "format-charging": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
+        "format-plugged": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
+        "format-alt": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {time}",
+        "format-full": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
+        "format-icons": ["", "", "", "", ""],
+        "tooltip-format": "{time}"
+    },
+    "custom/tailscale": {
+        "exec": "~/.config/scripts/tailscale-status.sh",
+        "interval": 5,
+        "tooltip": "Tailscale VPN status",
+        "format": "{}",
+        "return-type": "text"
+    },
+    "custom/cpu": {
+        "exec": "~/.config/waybar/scripts/stats.sh -C --cpu-threshold 50",
+        "interval": 3,
+        "tooltip": "CPU usage",
+        "format": "{}",
+        "return-type": "text"
+    },
+    "custom/memory": {
+        "exec": "~/.config/waybar/scripts/stats.sh -M --mem-threshold 80",
+        "interval": 5,
+        "tooltip": "Memory usage",
+        "format": "{}",
+        "return-type": "text"
+    },
+    "network": {
+        "format-wifi": " ",
+        "format-ethernet": "Eth",
+        "tooltip-format": "{ifname} via {gwaddr}",
+        "format-linked": "{ifname} (No IP) ",
+        "format-disconnected": "Disconnected ⚠",
+        //"format-alt": "{ifname}/{essid}: {ipaddr}/{cidr}",
+        "on-click": "kitty nmtui"
+    },
+    "pulseaudio": {
+        "format": "{icon}",
+        "format-muted": "",
+        "format-icons": {
+            "default": ["", "", " "]
+        },
+        "on-click": "pavucontrol -t 3",
+        "tooltip-format": "{desc} at {volume}%"
+    },
+    "custom/waybar-media": {
+        "return-type": "json",
+        "exec": "waybar-media.py status",
+        "on-click": "waybar-media.py playpause",
+        "on-scroll-up": "waybar-media.py previous",
+        "on-scroll-down": "waybar-media.py next",
+        "escape": true
+    }
 }
