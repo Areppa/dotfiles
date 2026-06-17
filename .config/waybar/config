@@ -85,7 +85,7 @@
   },
   "battery": {
     "interval": 5,
-    "on-click": "~/.config/scripts/powerprofile_switch.sh",
+    "on-click-right": "~/.config/scripts/powerprofile_switch.sh",
     "states": {
       "warning": 30,
       "critical": 15
