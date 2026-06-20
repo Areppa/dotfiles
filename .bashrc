@@ -541,3 +541,6 @@ eval "$(zoxide init bash)"
 if [[ "$(tty)" == "/dev/tty1" ]] && [ -f "$HOME/.xinitrc" ] && grep -q "^exec dwm" "$HOME/.xinitrc"; then
     startx
 fi
+
+# Scan AUR Packages when installing using aur-scanner
+source /usr/share/aur-scan/integration.bash
