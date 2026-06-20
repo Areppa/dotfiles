@@ -8,7 +8,9 @@ fi
 
 echo "Updating Spicetify..."
 
+spicetify backup apply
 spicetify upgrade
 spicetify apply
+spicetify restore backp apply
 
 echo "Done."
