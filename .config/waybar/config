@@ -140,12 +140,4 @@
         "on-click": "pavucontrol -t 3",
         "tooltip-format": "{desc} at {volume}%"
     },
-    "custom/waybar-media": {
-        "return-type": "json",
-        "exec": "waybar-media.py status",
-        "on-click": "waybar-media.py playpause",
-        "on-scroll-up": "waybar-media.py previous",
-        "on-scroll-down": "waybar-media.py next",
-        "escape": true
-    }
 }
