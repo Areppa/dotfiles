@@ -6,6 +6,9 @@ flatpak remove org.gnome.Mines org.gnome.Mahjongg -y
 # Update Flatpaks
 flatpak update -y
 
+# Update spicetify
+~/.config/scripts/software_maintenance/spicetify.sh
+
 # List user installed pacman apps and save it to txt file
 pacman -Qqe > ~/Programs/Backup/pacman/$HOSTNAME\_apps.txt
 echo Saved apps list to: $HOSTNAME\_apps.txt
