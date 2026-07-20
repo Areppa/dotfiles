@@ -47,7 +47,6 @@ alias mkdir='mkdir -p'
 alias ps='ps auxf'
 alias less='less -R'
 alias vi='nvim'
-alias yay='paru'
 
 # Change directory aliases
 alias home='cd ~'
