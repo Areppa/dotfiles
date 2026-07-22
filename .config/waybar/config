@@ -141,9 +141,9 @@
         "tooltip-format": "{desc} at {volume}%"
     },
     "custom/bluetooth-battery": {
-    "exec": "~/.config/waybar/scripts/bt_batt.sh",
-    "interval": 10,
-    "format": "{}",
-    "tooltip": true
+        "exec": "~/.config/waybar/scripts/bt_batt.sh",
+        "interval": 10,
+        "format": "{}",
+        "tooltip": true
     }
 }
