@@ -9,7 +9,8 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 ------------------------
 
 local terminal = "kitty"
-local fileManager = "nautilus --no-desktop -w"
+local fileManager = "kitty lf"
+local fileManagerGui = "nautilus --no-desktop -w"
 local audio_control = "pavucontrol -t 3"
 local browser = "helium-browser"
 local private_browser = browser .. " --incognito"
@@ -58,6 +59,7 @@ end)
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(fileManagerGui))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(private_browser))
 hl.bind(mainMod .. " + SHIFT + CTRL + N", hl.dsp.exec_cmd(tor_browser))
