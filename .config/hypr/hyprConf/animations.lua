@@ -32,7 +32,7 @@ hl.animation({
 hl.animation({
     leaf = "windowsIn",
     enabled = true,
-    speed = 2,
+    speed = 4,
     bezier = "easeOutQuint",
     style = "popin 87%",
 })
