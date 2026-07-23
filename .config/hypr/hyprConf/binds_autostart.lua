@@ -10,6 +10,8 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 local terminal = "kitty"
 local task_manager = "btop"
+local bluetooth_manager = "bluetui"
+local network_manager = "nmtui"
 local fileManager = "lf"
 local fileManagerGui = "nautilus --no-desktop -w"
 local audio_control = "pavucontrol -t 3"
@@ -72,7 +74,8 @@ hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(vm_manager))
 -- Settings, config, e.g.
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(audio_control))
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(clipboard_history))
-hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(terminal .. " bluetui"))
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(terminal .. " " .. bluetooth_manager))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd(terminal .. " " .. network_manager))
 hl.bind("CTRL + SHIFT + ESCAPE", hl.dsp.exec_cmd(terminal .. " " .. task_manager))
 
 -- Change OpenRGB profile
