@@ -10,7 +10,7 @@ local mainMod = "SUPER" -- Sets "Windows" key as main modifier
 
 local terminal = "kitty"
 local task_manager = "btop"
-local fileManager = "kitty lf"
+local fileManager = "lf"
 local fileManagerGui = "nautilus --no-desktop -w"
 local audio_control = "pavucontrol -t 3"
 local browser = "helium-browser"
@@ -21,7 +21,6 @@ local text_editor = "zeditor"
 local text_editor_simple = "gnome-text-editor"
 local screenshot = "hyprshot -o ~/Pictures/Screenshots/Hyprland"
 local calculator = "gnome-calculator"
-local llm = browser .. " --app=\"https://duck.ai\""
 local vm_manager = "virt-manager"
 local rgb_controller = "flatpak run org.openrgb.OpenRGB -p"
 local clipboard_history = "cliphist list   | ROFI_LIST=true rofi -dmenu -p \"\" -display-columns 2   | cliphist decode   | wl-copy"
@@ -59,7 +58,7 @@ end)
 -- Main programs
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(terminal .. " " .. fileManager))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(fileManagerGui))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(private_browser))
