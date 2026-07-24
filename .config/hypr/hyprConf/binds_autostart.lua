@@ -77,6 +77,7 @@ hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(clipboard_history))
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(terminal .. " " .. bluetooth_manager))
 hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd(terminal .. " " .. network_manager))
 hl.bind("CTRL + SHIFT + ESCAPE", hl.dsp.exec_cmd(terminal .. " " .. task_manager))
+hl.bind(mainMod .. " + CTRL + SHIFT + P", hl.dsp.exec_cmd(terminal .. " ping 1.1.1.1"))
 
 -- Change OpenRGB profile
 hl.bind(mainMod .. " + I", hl.dsp.exec_cmd(rgb_controller .. "\"Off\""))
