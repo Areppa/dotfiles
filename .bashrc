@@ -63,6 +63,9 @@ alias taildown='sudo tailscale down'
 # Connect to phones hotspot
 alias ah='~/.config/scripts/auto_hotspot.sh'
 
+# Show weather
+alias weather='curl wttr.in'
+
 # aliases to show disk space and space used in a folder
 alias diskspace="du -S | sort -n -r |more"
 alias folders='du -h --max-depth=1'
