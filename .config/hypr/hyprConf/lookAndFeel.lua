@@ -16,7 +16,14 @@ hl.config({
         },
         resize_on_border = false,
         allow_tearing = false,
-        layout = "dwindle",
+        layout = "scrolling",
+    },
+
+    scrolling = {
+        fullscreen_on_one_column = true,
+        direction = "right",
+        follow_focus = true,
+        column_width = 0.8,
     },
 
     decoration = {
