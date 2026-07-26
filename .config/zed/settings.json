@@ -10,7 +10,7 @@
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)",
+    "dark": "Colored Zed Icons Theme Dark",
   },
   "git_panel": {
     "group_by": "status",
@@ -30,6 +30,6 @@
   "theme": {
     "mode": "dark",
     "light": "One Light",
-    "dark": "One Dark",
+    "dark": "Duskfox - blurred",
   },
 }
