@@ -1,6 +1,15 @@
+
+
 --------------------
 --- WINDOW RULES ---
 --------------------
+
+
+hl.window_rule({
+    name = "Active window",
+    match = { focus = false },
+    opacity = 0.90,
+})
 
 hl.window_rule({
     match = {
@@ -46,6 +55,7 @@ hl.window_rule({
     },
     workspace = "10",
     fullscreen = true,
+    confine_pointer = true,
 })
 
 hl.window_rule({
@@ -81,6 +91,14 @@ hl.window_rule({
         class = "com.mitchellh.ghostty",
     },
     opacity = "0.90 override",
+})
+
+hl.window_rule({
+    name = "ZED",
+    match = {
+        class = "dev.zed.Zed"
+    },
+    opacity = "1 override",
 })
 
 hl.window_rule({
