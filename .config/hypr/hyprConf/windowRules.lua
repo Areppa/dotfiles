@@ -1,14 +1,21 @@
+hl.workspace_rule({
+    workspace = 1,
+    monitor = "eDP-1",
+    layout = "master"
+})
 
+hl.workspace_rule({
+    workspace = 2,
+    layout = "scrolling"
+})
 
 --------------------
 --- WINDOW RULES ---
 --------------------
 
-
 hl.window_rule({
     name = "Active window",
     match = { focus = false },
-    opacity = 0.90,
 })
 
 hl.window_rule({

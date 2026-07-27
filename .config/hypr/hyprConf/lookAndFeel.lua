@@ -9,14 +9,14 @@ hl.config({
     general = {
         gaps_in = 3,
         gaps_out = 8,
-        border_size = 0,
+        border_size = 3,
         col = {
             active_border = "rgba(800080ff)",
             inactive_border = "rgba(595959ff)",
         },
         resize_on_border = false,
         allow_tearing = false,
-        layout = "scrolling",
+        layout = "dwindle",
     },
 
     scrolling = {
