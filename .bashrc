@@ -51,6 +51,15 @@ alias vi='nvim'
 # Change directory aliases
 alias home='cd ~'
 
+# Commands to speedup terimnal use
+alias hist='history | grep'
+alias q='exit'
+
+# Better cd behavior
+shopt -s cdspell     # Typos in cd are corrected
+shopt -s dirspell    # Tab completion fixes typos
+shopt -s direxpand   # Variable names are expanded for completion
+
 # Check if eza is installed and set alias accordingly
 if command -v eza &> /dev/null; then
     alias ls='eza -l --group-directories-first --git'
@@ -89,6 +98,11 @@ function whatsmyip () {
     # External IP Lookup
     echo -n "External IP: "
     curl -s ifconfig.me
+}
+
+# Back up a file quickly
+backup() {
+    cp "$1" "${1}.backup.$(date +%Y%m%d_%H%M%S)"
 }
 
 #######################################################
