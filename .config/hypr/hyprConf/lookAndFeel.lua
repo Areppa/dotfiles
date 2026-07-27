@@ -49,10 +49,9 @@ hl.config({
 
     dwindle = {
         preserve_split = true, -- You probably want this
-    },
-
-    master = {
-        new_status = "master",
+        force_split = 2,
+        split_width_multiplier = 1,
+        default_split_ratio = 0.75,
     },
 
     misc = {
