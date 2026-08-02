@@ -23,7 +23,7 @@ hl.config({
         fullscreen_on_one_column = true,
         direction = "right",
         follow_focus = true,
-        column_width = 0.8,
+        column_width = 0.6,
     },
 
     decoration = {
