@@ -1,0 +1,9 @@
+[unit]
+Description=Desktop alert warning of low remaining battery
+
+[Service]
+Type=oneshot
+ExecStart=/home/areppa/.config/scripts/alert_battery.sh
+
+[Install]
+WantedBy=graphical.target
