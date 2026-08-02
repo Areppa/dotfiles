@@ -1,8 +1,8 @@
 [Default Applications]
-x-scheme-handler/http=brave-browser.desktop
+x-scheme-handler/http=helium.desktop
 application/xhtml+xml=com.brave.Browser.desktop
-text/html=brave-browser.desktop
-x-scheme-handler/https=brave-browser.desktop
+text/html=helium.desktop
+x-scheme-handler/https=helium.desktop
 video/x-ogm+ogg=vlc.desktop
 video/ogg=vlc.desktop
 video/x-ogm=vlc.desktop
@@ -56,8 +56,8 @@ image/png=org.gnome.Loupe.desktop
 text/csv=com.vscodium.codium.desktop
 application/x-zerosize=com.vscodium.codium.desktop
 image/webp=org.gnome.Loupe.desktop
-x-scheme-handler/about=brave-browser.desktop
-x-scheme-handler/unknown=brave-browser.desktop
+x-scheme-handler/about=helium.desktop
+x-scheme-handler/unknown=helium.desktop
 
 [Added Associations]
 x-scheme-handler/http=com.brave.Browser.desktop;
