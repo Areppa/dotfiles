@@ -7,7 +7,7 @@
         "custom/cpu"
     ],
   "modules-center": [
-        "hyprland/workspaces"
+        "ext/workspaces"
     ],
   "modules-right": [
         "tray",
@@ -63,10 +63,13 @@
   "tray": {
         "spacing": 10
   },
-  "hyprland/workspaces": {
+  "ext/workspaces": {
          "disable-scroll": true,
          "all-outputs": false,
-         "warp-on-scroll": false
+         "warp-on-scroll": true,
+         "on-click": "activate",
+         "active-only": false,
+         "format": "{icon}",
   },
   "bluetooth": {
       // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
