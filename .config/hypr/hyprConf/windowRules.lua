@@ -100,7 +100,15 @@ hl.window_rule({
 })
 
 hl.window_rule({
-    name = "ZED",
+    name = "Obsidian",
+    match = {
+        class = "md.Obsidian"
+    },
+    workspace = 3,
+})
+
+hl.window_rule({
+    name = "Zed",
     match = {
         class = "dev.zed.Zed"
     },
