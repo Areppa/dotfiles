@@ -26,6 +26,8 @@ local calculator = "gnome-calculator"
 local vm_manager = "virt-manager"
 local rgb_controller = "flatpak run org.openrgb.OpenRGB -p"
 local clipboard_history = "cliphist list   | ROFI_LIST=true rofi -dmenu -p \"\" -display-columns 2   | cliphist decode   | wl-copy"
+local vpn_on_command = "sudo tailscale up"
+local vpn_off_command = "sudo tailscale down"
 
 ---------------
 --- AUTORUN ---
@@ -148,3 +150,7 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
+
+-- Tailscale up and down
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(terminal .. " " .. vpn_on_command))
+hl.bind(mainMod .. " + SHIFT + CTRL + V", hl.dsp.exec_cmd(terminal .. " " .. vpn_off_command))
