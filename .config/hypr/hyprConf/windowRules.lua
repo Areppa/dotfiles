@@ -1,11 +1,16 @@
 hl.workspace_rule({
     workspace = 1,
-    monitor = "eDP-1",
+    persistent = true,
 })
 
 hl.workspace_rule({
     workspace = 2,
     layout = "scrolling"
+})
+
+hl.workspace_rule({
+    workspace = 3,
+    layout = "scrolling",
 })
 
 --------------------
@@ -102,7 +107,7 @@ hl.window_rule({
 hl.window_rule({
     name = "Obsidian",
     match = {
-        class = "md.Obsidian"
+        class = "md.obsidian.Obsidian"
     },
     workspace = 3,
 })
