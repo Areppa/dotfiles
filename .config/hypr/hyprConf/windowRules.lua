@@ -5,7 +5,6 @@ hl.workspace_rule({
 
 hl.workspace_rule({
     workspace = 2,
-    layout = "scrolling"
 })
 
 hl.workspace_rule({
