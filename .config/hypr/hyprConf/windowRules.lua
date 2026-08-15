@@ -64,6 +64,7 @@ hl.window_rule({
         class = "^steam_app_\\d+$",
     },
     workspace = "10",
+    content = "game",
     fullscreen = true,
     confine_pointer = true,
 })
