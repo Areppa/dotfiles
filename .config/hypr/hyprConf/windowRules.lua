@@ -125,7 +125,4 @@ hl.window_rule({
     match = {
         class = "org.gnome.TextEditor",
     },
-    workspace = "special",
-    float = true,
-    size = "800 700",
 })
