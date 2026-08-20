@@ -42,3 +42,19 @@ hl.workspace_rule({
     workspace = 10,
     monitor = "DP-2",
 })
+
+---------------
+--- AUTORUN ---
+---------------
+
+hl.on("hyprland.start", function()
+    -- Visible apps
+    hl.exec_cmd("spotify", { workspace = "2 silent" })
+
+    -- Background apps
+    hl.exec_cmd("flatpak run org.openrgb.OpenRGB --startminimized")
+    hl.exec_cmd("steam -silent -console")
+    hl.exec_cmd("udiskie")
+    hl.exec_cmd("/bin/bash -c \"sleep 5 && flatpak run com.github.wwmm.easyeffects -w\"")
+    hl.exec_cmd("/opt/duplicati/duplicati-server")
+end)
