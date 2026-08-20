@@ -31,6 +31,8 @@
 #custom-tailscale,
 #custom-cpu,
 #custom-memory,
+#custom-network-down,
+#custom-network-up,
 #workspaces button.active,
 #custom-lock {
     border-radius: 10px;

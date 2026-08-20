@@ -4,7 +4,9 @@
   "modules-left": [
         "clock",
         "custom/memory",
-        "custom/cpu"
+        "custom/cpu",
+        "custom/network-down",
+        "custom/network-up",
     ],
   "modules-center": [
         "ext/workspaces"
@@ -106,6 +108,20 @@
     "exec": "~/.config/scripts/tailscale-status.sh",
     "interval": 10,
     "tooltip": "Tailscale VPN status",
+    "format": "{}",
+    "return-type": "text"
+  },
+  "custom/network-down": {
+    "exec": "~/.config/waybar/scripts/network.sh -D -L 25",
+    "interval": 1,
+    "tooltip": "Download - Mbps",
+    "format": "{}",
+    "return-type": "text"
+  },
+  "custom/network-up": {
+    "exec": "~/.config/waybar/scripts/network.sh -U -L 5",
+    "interval": 1,
+    "tooltip": "Upload - Mbps",
     "format": "{}",
     "return-type": "text"
   },
