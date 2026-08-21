@@ -4,6 +4,7 @@
 DOWNLOAD_ICON="↓ "
 UPLOAD_ICON="↑ "
 SHOW_MBPS=true
+HISTORY_COUNT=3        # Number of samples to average
 
 mode="download"
 limit="0"
@@ -58,7 +59,7 @@ rate=$(awk -v bytes="$bytes" \
 tmp="${history}.tmp"
 
 {
-    tail -n 4 "$history" 2>/dev/null
+    tail -n "$((HISTORY_COUNT - 1))" "$history" 2>/dev/null
     printf '%s\n' "$rate"
 } > "$tmp"
 
