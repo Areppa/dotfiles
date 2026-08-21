@@ -26,14 +26,16 @@ lock="${history}.lock"
 exec 9>"$lock"
 flock 9
 
+interface=$(ip route show default 2>/dev/null | awk 'NR == 1 { print $5; exit }')
+
 read_counters() {
-    awk '
-        $1 != "lo:" {
-            rx += $2
-            tx += $10
+    awk -v interface="$interface" '
+        $1 == interface ":" {
+            rx = $2
+            tx = $10
         }
         END {
-            print rx, tx
+            print rx + 0, tx + 0
         }
     ' /proc/net/dev
 }
