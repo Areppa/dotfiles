@@ -7,6 +7,11 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "language_models": {
+    "ollama": {
+      "api_url": "http://192.168.1.24:11434"
+    }
+  },
   "agent": {
     "dock": "left",
     "default_model": {
