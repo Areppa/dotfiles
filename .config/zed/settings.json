@@ -7,6 +7,25 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "agent": {
+    "dock": "left",
+    "default_model": {
+      "provider": "ollama",
+      "model": "qwen3:8b",
+      "enable_thinking": false
+    },
+    "favorite_models": [
+      {
+        "provider": "ollama",
+        "model": "qwen3:8b",
+        "enable_thinking": false
+      }
+    ],
+    "model_parameters": []
+  },
+  "edit_predictions": {
+    "provider": "ollama"
+  },
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
