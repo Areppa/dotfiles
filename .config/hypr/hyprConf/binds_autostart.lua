@@ -12,8 +12,8 @@ local terminal = "kitty"
 local task_manager = "btop"
 local bluetooth_manager = "bluetui"
 local network_manager = "nmtui"
-local fileManager = "lf"
-local fileManagerGui = "nautilus --no-desktop -w"
+local fileManager = "nautilus --no-desktop -w"
+local fileManagerTUI = "lf"
 local audio_control = "pavucontrol -t 3"
 local browser = "brave-origin"
 local private_browser = browser .. " --incognito"
@@ -54,8 +54,8 @@ end)
 -- Main programs
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(terminal .. " " .. fileManager))
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(fileManagerGui))
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(terminal .. " " .. fileManagerTUI))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(private_browser))
 hl.bind(mainMod .. " + SHIFT + CTRL + N", hl.dsp.exec_cmd(tor_browser))
