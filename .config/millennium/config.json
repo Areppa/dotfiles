@@ -1,0 +1,79 @@
+{
+  "general": {
+    "accentColor": "#ae00ff",
+    "checkForMillenniumUpdates": true,
+    "checkForPluginAndThemeUpdates": true,
+    "injectCSS": true,
+    "injectJavascript": true,
+    "millenniumUpdateChannel": "stable",
+    "onMillenniumUpdate": 1,
+    "shouldShowThemePluginUpdateNotifications": true
+  },
+  "misc": {
+    "hasShownWelcomeModal": true
+  },
+  "network": {
+    "proxy": "",
+    "proxyPassword": "",
+    "proxyUsername": ""
+  },
+  "notifications": {
+    "showNotifications": true,
+    "showPluginNotifications": true,
+    "showUpdateNotifications": true
+  },
+  "plugins": {
+    "enabledPlugins": [
+      "achievement-groups",
+      "extendium"
+    ]
+  },
+  "themes": {
+    "activeTheme": "NEVKO-UI",
+    "allowedScripts": true,
+    "allowedStyles": true,
+    "conditions": {
+      "NEVKO-UI": {
+        "Alternative Online Indicator": "yes",
+        "Avatar Decoration": "no",
+        "Badges for Contributors": "yes",
+        "Blur Account Name": "yes",
+        "Blur Balance": "no",
+        "DRIVER = 1": "",
+        "DRIVER = 2": "",
+        "DRIVER = 3": "",
+        "DRIVER = 4": "",
+        "DRIVER = 5": "",
+        "Fonts [WIP]": "Steam Default",
+        "Game Page Content Location": "[All] Center",
+        "Gamepage Side": "Left Side",
+        "Hide Balance": "no",
+        "Hide Profile Button": "yes",
+        "Hiding Library Items": "None",
+        "Library Side": "Left Side",
+        "Move Bottom Buttons to Top Bar": "yes",
+        "Move URL Bar to Bottom": "yes",
+        "Refresh Friends & Chat": "Disabled",
+        "Refresh Settings": "Enabled",
+        "Remove Window Buttons": "All",
+        "Reorder Main Buttons": "yes",
+        "Resize Library List": "Medium",
+        "Rounding Avatars": "Rounded Square",
+        "Style Menu": "Spacious"
+      }
+    },
+    "themeColors": {
+      "NEVKO-UI": {
+        "--custom-accent": "#c700c7",
+        "--green-color": "#c700c7",
+        "--idle-status": "#4C91AC",
+        "--ingame-status": "#8CD61D",
+        "--ingameidle-status": "#62813B",
+        "--main-background": "#161D25",
+        "--offline-status": "#898989",
+        "--online-status": "#4CB4FF",
+        "--purple-color": "#834E8D"
+      }
+    }
+  }
+}
