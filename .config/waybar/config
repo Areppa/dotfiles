@@ -112,7 +112,7 @@
     "return-type": "text"
   },
   "custom/network-down": {
-    "exec": "~/.config/waybar/scripts/network.sh -D -L 25",
+    "exec": "~/.config/waybar/scripts/network.sh -D -L 20",
     "interval": 1,
     "tooltip": "Download - Mbps",
     "format": "{}",
