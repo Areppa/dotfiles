@@ -39,6 +39,16 @@ hl.workspace_rule({
 })
 
 hl.workspace_rule({
+    workspace = 6,
+    monitor = "DP-2",
+})
+
+hl.workspace_rule({
+    workspace = 7,
+    monitor = "DP-2",
+})
+
+hl.workspace_rule({
     workspace = 10,
     monitor = "DP-2",
 })
