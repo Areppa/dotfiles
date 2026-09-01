@@ -127,7 +127,7 @@
   },
   "custom/bluetooth": {
     "exec": "~/.config/waybar/scripts/bluetooth.sh",
-    "interval": 1,
+    "interval": 3,
     "tooltip": "Bluetooth devices",
     "format": "{}",
     "return-type": "text"
