@@ -14,7 +14,7 @@
   "modules-right": [
         "tray",
         "pulseaudio",
-        "bluetooth",
+        "custom/bluetooth",
         "custom/tailscale",
         "network",
         "battery"
@@ -122,6 +122,13 @@
     "exec": "~/.config/waybar/scripts/network.sh -U -L 5",
     "interval": 1,
     "tooltip": "Upload - Mbps",
+    "format": "{}",
+    "return-type": "text"
+  },
+  "custom/bluetooth": {
+    "exec": "~/.config/waybar/scripts/bluetooth.sh",
+    "interval": 1,
+    "tooltip": "Bluetooth devices",
     "format": "{}",
     "return-type": "text"
   },
