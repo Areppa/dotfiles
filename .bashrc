@@ -188,8 +188,10 @@ alias checkcommand="type -t"
 alias openports='netstat -nape --inet'
 
 # Enable or disable tailscale
-alias tailup='sudo tailscale up'
-alias taildown='sudo tailscale down'
+# Add permissions to run without root:
+# sudo tailscale set --operator=$USER
+alias tailup='tailscale up'
+alias taildown='tailscale down'
 
 # aliases for safe and forced reboots
 alias rebootsafe='sudo shutdown -r now'
