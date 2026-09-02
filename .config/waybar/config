@@ -2,91 +2,85 @@
   "position": "top",
   "height": 44,
   "modules-left": [
-        "clock",
-        "custom/memory",
-        "custom/cpu",
-        "custom/network-down",
-        "custom/network-up",
-    ],
+    "clock",
+    "custom/memory",
+    "custom/cpu",
+    "custom/network-down",
+    "custom/network-up"
+  ],
   "modules-center": [
-        "ext/workspaces"
-    ],
+    "ext/workspaces"
+  ],
   "modules-right": [
-        "tray",
-        "pulseaudio",
-        "custom/bluetooth",
-        "custom/tailscale",
-        "network",
-        "battery"
-    ],
-    "clock": {
-        "format": "{:%a %d %H:%M}",
-        "format-alt": "{:%A, %B %d, %Y (%R)}  ",
-        "tooltip-format": "<tt><small>{calendar}</small></tt>",
-        "calendar": {
-                    "mode"          : "month",
-                    "mode-mon-col"  : 3,
-                    "weeks-pos"     : "right",
-                    "on-scroll"     : 1,
-                    "format": {
-                              "months":     "<span color='#ffead3'><b>{}</b></span>",
-                              "days":       "<span color='#ecc6d9'><b>{}</b></span>",
-                              "weeks":      "<span color='#99ffdd'><b>W{}</b></span>",
-                              "weekdays":   "<span color='#ffcc66'><b>{}</b></span>",
-                              "today":      "<span color='#ff6699'><b><u>{}</u></b></span>"
-                              }
-                    },
-        "actions":  {
-                    "on-click-right": "mode",
-                    "on-scroll-up": "tz_up",
-                    "on-scroll-down": "tz_down",
-                    "on-scroll-up": "shift_up",
-                    "on-scroll-down": "shift_down"
-                    }
+    "tray",
+    "pulseaudio",
+    "custom/bluetooth",
+    "custom/tailscale",
+    "network",
+    "battery"
+  ],
+  "clock": {
+    "format": "{:%a %d %H:%M}",
+    "format-alt": "{:%A, %B %d, %Y (%R)}  ",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "month",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
     },
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up": "tz_up",
+      "on-scroll-down": "tz_down"
+    }
+  },
   "cpu": {
-     "interval": 5,
-     "format": "\udb80\udf5b {usage}%",
-     "format-icons": [
-          "<span color='#69ff94'>▁</span>",
-          "<span color='#2aa9ff'>▂</span>",
-          "<span color='#f8f8f2'>▃</span>",
-          "<span color='#f8f8f2'>▄</span>",
-          "<span color='#ffffa5'>▅</span>",
-          "<span color='#ffffa5'>▆</span>",
-          "<span color='#ff9977'>▇</span>",
-          "<span color='#dd532e'>█</span>"
-     ]
+    "interval": 5,
+    "format": "\udb80\udf5b {usage}%",
+    "format-icons": [
+      "<span color='#69ff94'>▁</span>",
+      "<span color='#2aa9ff'>▂</span>",
+      "<span color='#f8f8f2'>▃</span>",
+      "<span color='#f8f8f2'>▄</span>",
+      "<span color='#ffffa5'>▅</span>",
+      "<span color='#ffffa5'>▆</span>",
+      "<span color='#ff9977'>▇</span>",
+      "<span color='#dd532e'>█</span>"
+    ]
   },
   "memory": {
-     "interval": 5,
+    "interval": 5,
     "format": "{used:0.1f} GiB"
   },
   "tray": {
-        "spacing": 10
+    "spacing": 10
   },
   "ext/workspaces": {
-         "disable-scroll": true,
-         "all-outputs": false,
-         "warp-on-scroll": true,
-         "on-click": "activate",
-         "active-only": false,
-         "format": "{icon}",
+    "disable-scroll": true,
+    "all-outputs": false,
+    "warp-on-scroll": true,
+    "on-click": "activate",
+    "active-only": false,
+    "format": "{icon}"
   },
   "bluetooth": {
-      // "controller": "controller1", // specify the alias of the controller if there are more than 1 on the system
-      // "format": "󰂯 {status}",
-      // format-* handles every state, so default format is not necessary.
-      "format-on": "", // bt icon: 󰂯
-      "format-off": "", // bt off: 󰂲
-      "format-disabled": "", // an empty format will hide the module
-      "format-connected": "󰂱  {num_connections}",
-      "format-no-controller": "",
-      // "tooltip-format": "{controller_alias}\t{controller_address}",
-      // "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{device_enumerate}",
-      "tooltip-format-connected": "{device_enumerate}",
-      "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
-      "on-click": "kitty bluetui"
+    "controller": "",
+    "format-on": "",
+    "format-off": "",
+    "format-disabled": "",
+    "format-connected": "󰂱  {num_connections}",
+    "format-no-controller": "",
+    "tooltip-format-connected": "{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+    "on-click": "kitty bluetui"
   },
   "battery": {
     "interval": 5,
@@ -147,21 +141,20 @@
     "return-type": "text"
   },
   "network": {
-      "format-wifi": " ",
-      "format-ethernet": "Eth",
-      "tooltip-format": "{ifname} via {gwaddr}",
-      "format-linked": "{ifname} (No IP) ",
-      "format-disconnected": "Disconnected ⚠",
-      //"format-alt": "{ifname}/{essid}: {ipaddr}/{cidr}",
-      "on-click": "kitty nmtui"
+    "format-wifi": " ",
+    "format-ethernet": "Eth",
+    "tooltip-format": "{ifname} via {gwaddr}",
+    "format-linked": "{ifname} (No IP) ",
+    "format-disconnected": "Disconnected ⚠",
+    "on-click": "kitty nmtui"
   },
   "pulseaudio": {
-      "format": "{icon}",
-      "format-muted": "",
-      "format-icons": {
-          "default": ["", "", " "]
-      },
-      "on-click": "pavucontrol -t 3",
-      "tooltip-format": "{desc} at {volume}%"
+    "format": "{icon}",
+    "format-muted": "",
+    "format-icons": {
+      "default": ["", "", " "]
+    },
+    "on-click": "pavucontrol -t 3",
+    "tooltip-format": "{desc} at {volume}%"
   }
 }
