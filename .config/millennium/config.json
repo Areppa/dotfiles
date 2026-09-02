@@ -25,7 +25,8 @@
   "plugins": {
     "enabledPlugins": [
       "achievement-groups",
-      "extendium"
+      "extendium",
+      "protondb"
     ]
   },
   "themes": {
