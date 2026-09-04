@@ -71,17 +71,6 @@
     "active-only": false,
     "format": "{icon}"
   },
-  "bluetooth": {
-    "controller": "",
-    "format-on": "",
-    "format-off": "",
-    "format-disabled": "",
-    "format-connected": "󰂱  {num_connections}",
-    "format-no-controller": "",
-    "tooltip-format-connected": "{device_enumerate}",
-    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
-    "on-click": "kitty bluetui"
-  },
   "battery": {
     "interval": 5,
     "states": {
@@ -124,7 +113,8 @@
     "interval": 3,
     "tooltip": "Bluetooth devices",
     "format": "{}",
-    "return-type": "text"
+    "return-type": "text",
+    "on-click": "kitty bluetui"
   },
   "custom/cpu": {
     "exec": "~/.config/waybar/scripts/stats.sh -C --cpu-threshold 50",
