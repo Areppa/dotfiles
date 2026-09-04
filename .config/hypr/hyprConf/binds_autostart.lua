@@ -19,6 +19,7 @@ local browser = "brave-origin"
 local private_browser = browser .. " --incognito"
 local tor_browser = "torbrowser-launcher"
 local menu = "ROFI_LIST=true rofi -show drun"
+local emoji_picker = "rofimoji --use-icons --max-recent 0 --prompt 👉 --action clipboard type"
 local text_editor = "zeditor"
 local text_editor_simple = "gnome-text-editor"
 local screenshot = "hyprshot -o ~/Pictures/Screenshots/Hyprland"
@@ -81,6 +82,9 @@ hl.bind(mainMod .. " + CTRL + I", hl.dsp.exec_cmd(rgb_controller .. "\"Default\"
 hl.bind("PRINT", hl.dsp.exec_cmd(screenshot .. " -m window"))
 hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd(screenshot .. " -m region"))
 hl.bind("CTRL + SHIFT + PRINT", hl.dsp.exec_cmd(screenshot .. " -m output"))
+
+-- Emoji picker
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd(emoji_picker))
 
 -- Game launch (disables 2nd screen for some time until the game launches, "Temporary")
 hl.bind(mainMod .. " + CTRL + G", hl.dsp.exec_cmd("~/.config/scripts/game_launch.sh"))
