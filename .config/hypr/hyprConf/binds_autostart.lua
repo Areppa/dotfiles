@@ -18,7 +18,8 @@ local audio_control = "pavucontrol -t 3"
 local browser = "brave-origin"
 local private_browser = browser .. " --incognito"
 local tor_browser = "torbrowser-launcher"
-local menu = "ROFI_LIST=true rofi -show drun"
+--local menu = "ROFI_LIST=true rofi -show combi -combi-modes 'drun,calc,web,emoji'"
+local menu = "vicinae open"
 local emoji_picker = "rofimoji --use-icons --max-recent 0 --prompt 👉 --action clipboard type"
 local text_editor = "zeditor"
 local text_editor_simple = "gnome-text-editor"
@@ -27,8 +28,6 @@ local calculator = "gnome-calculator"
 local vm_manager = "virt-manager"
 local rgb_controller = "flatpak run org.openrgb.OpenRGB -p"
 local clipboard_history = "cliphist list   | ROFI_LIST=true rofi -dmenu -p \"\" -display-columns 2   | cliphist decode   | wl-copy"
-local vpn_on_command = "sudo tailscale up"
-local vpn_off_command = "sudo tailscale down"
 
 ---------------
 --- AUTORUN ---
@@ -146,7 +145,3 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), { locked = true })
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), { locked = true })
-
--- Tailscale up and down
-hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(terminal .. " " .. vpn_on_command))
-hl.bind(mainMod .. " + SHIFT + CTRL + V", hl.dsp.exec_cmd(terminal .. " " .. vpn_off_command))

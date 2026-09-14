@@ -19,7 +19,7 @@
 
 configuration {
 	/*---------- General setting ----------*/
-	modi: "drun,run";
+	modi: "drun,run,calc,web,emoji:rofimoji";
 	case-sensitive: false;
 	cycle: true;
 	filter: "";
@@ -139,7 +139,7 @@ listview {
     reverse:                     false;
     fixed-height:                true;
     fixed-columns:               true;
-    
+
     spacing:                     5px;
     margin:                      0px;
     padding:                     10px;
