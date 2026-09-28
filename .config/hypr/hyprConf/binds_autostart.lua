@@ -18,8 +18,8 @@ local audio_control = "pavucontrol -t 3"
 local browser = "brave-origin"
 local private_browser = browser .. " --incognito"
 local tor_browser = "torbrowser-launcher"
---local menu = "ROFI_LIST=true rofi -show combi -combi-modes 'drun,calc,web,emoji'"
-local menu = "vicinae open"
+local menu = "ROFI_LIST=true rofi -show drun"
+--local menu = "vicinae open"
 local emoji_picker = "rofimoji --use-icons --max-recent 0 --prompt 👉 --action clipboard type"
 local text_editor = "zeditor"
 local text_editor_simple = "gnome-text-editor"
@@ -36,7 +36,6 @@ local clipboard_history = "cliphist list   | ROFI_LIST=true rofi -dmenu -p \"
 hl.on("hyprland.start", function()
     -- HYPRLAND & SYSTEM
     hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-    hl.exec_cmd("hyprlock")
     hl.exec_cmd("waybar & swaync & hypridle & hyprpaper")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
@@ -64,6 +63,9 @@ hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("flatpak run md.obsidian.Obsidian"))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(text_editor))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(text_editor_simple))
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(vm_manager))
+
+-- Power management
+hl.bind("XF86AudioStop", hl.dsp.exec_cmd("systemctl suspend"))
 
 -- Settings, config, e.g.
 hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(audio_control))
@@ -136,8 +138,7 @@ hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURC
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 
--- Audio switching using STOP media button
-hl.bind("XF86AudioStop", hl.dsp.exec_cmd("~/.config/scripts/change_audio.sh"))
+-- Audio switching
 hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("~/.config/scripts/change_audio.sh"))
 
 -- Requires playerctl
