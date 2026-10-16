@@ -1,16 +1,26 @@
+# Managed by Strata. Unlock encrypted volumes. Do not edit this header.
 program_options:
-  tray: false              # Show tray icon
-  notify: true           # Enable notifications
-  automount: true        # Enable automatic mounting
-  file_manager: nautilus --no-desktop -w # Program to open mounted directories
-
+  tray: false
+  notify: true
+  automount: true
+  file_manager: nautilus --no-desktop -w
+  event_hook:
+  - /home/areppa/.local/bin/strata
+  - --udiskie-hook
+  - '{event}'
+  - '{id_usage}'
+  - '{device_file}'
+  - '{id_uuid}'
+  password_prompt: false
 device_config:
-  # Example: Special options for specific devices
-  - id_uuid: "your-device-uuid"
-    options: [noexec, nodev]
-    ignore: false
-    automount: false
-
+- is_luks: true
+  automount: false
+- id_uuid: your-device-uuid
+  options:
+  - noexec
+  - nodev
+  ignore: false
+  automount: false
 notifications:
-  timeout: 1.5           # Notification timeout in seconds
-  device_mounted: 5      # Show mount notifications for 5 seconds
+  timeout: 1.5
+  device_mounted: 5
