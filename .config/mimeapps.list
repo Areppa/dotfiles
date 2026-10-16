@@ -22,6 +22,7 @@ text/x-shellscript=dev.zed.Zed.desktop
 text/vcard=dev.zed.Zed.desktop
 application/pdf=jopdf.desktop
 video/matroska=org.gnome.Totem.desktop
+inode/directory=io.github.lgse.Strata.desktop
 
 [Added Associations]
 image/jpeg=org.gnome.Loupe.desktop;
