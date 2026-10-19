@@ -16,10 +16,10 @@ local network_manager = "nmtui"
 local fileManager = os.getenv("HOME") .. "/.local/bin/strata"
 local fileManagerTUI = "lf"
 local audio_control = "pavucontrol -t 3"
---local browser = "brave-origin"
-local browser = "floorp"
---local private_browser = browser .. " --incognito"
-local private_browser = browser .. " --private-window"
+local browser = "brave-origin"
+--local browser = "floorp"
+local private_browser = browser .. " --incognito"
+--local private_browser = browser .. " --private-window"
 local tor_browser = "torbrowser-launcher"
 local menu = "ROFI_LIST=true rofi -show drun"
 --local menu = "vicinae open"
@@ -44,7 +44,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
 
     -- Visible apps
-    hl.exec_cmd(browser, { workspace = "5 silent" })
+    hl.exec_cmd(browser, { workspace = "1 silent" })
     hl.exec_cmd("flatpak run dev.vencord.Vesktop", { workspace = "2 silent" })
     hl.exec_cmd("flatpak run md.obsidian.Obsidian", { workspace = "3 silent" })
 end)
