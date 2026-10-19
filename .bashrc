@@ -168,6 +168,9 @@ if command -v eza &> /dev/null; then
     alias ls='eza -l --group-directories-first --git'
 fi
 
+# Use paru instead of yay
+alias yay='paru'
+
 # Search command line history
 alias h="history | grep "
 
