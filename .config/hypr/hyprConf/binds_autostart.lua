@@ -26,7 +26,7 @@ local menu = "ROFI_LIST=true rofi -show drun"
 local emoji_picker = "rofimoji --use-icons --max-recent 0 --prompt 👉 --action clipboard type"
 local text_editor = "zeditor"
 local text_editor_simple = "kitty nvim"
-local screenshot = "hyprshot -o ~/Pictures/Screenshots/Hyprland"
+local screenshot = "lumine-capture"
 local calculator = "gnome-calculator"
 local vm_manager = "virt-manager"
 local rgb_controller = "flatpak run org.openrgb.OpenRGB -p"
@@ -83,9 +83,9 @@ hl.bind(mainMod .. " + I", hl.dsp.exec_cmd(rgb_controller .. "\"Off\""))
 hl.bind(mainMod .. " + CTRL + I", hl.dsp.exec_cmd(rgb_controller .. "\"Default\""))
 
 -- Screenshots
-hl.bind("PRINT", hl.dsp.exec_cmd(screenshot .. " -m window"))
-hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd(screenshot .. " -m region"))
-hl.bind("CTRL + SHIFT + PRINT", hl.dsp.exec_cmd(screenshot .. " -m output"))
+hl.bind("PRINT", hl.dsp.exec_cmd(screenshot))
+hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd(screenshot .. " --region"))
+hl.bind("CTRL + SHIFT + PRINT", hl.dsp.exec_cmd(screenshot .. " --full"))
 
 -- Emoji picker
 hl.bind(mainMod .. " + period", hl.dsp.exec_cmd(emoji_picker))
