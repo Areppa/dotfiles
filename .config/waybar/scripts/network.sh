@@ -2,15 +2,15 @@
 
 # Settings
 PING_TARGET="1.1.1.1"
-PING_TIMEOUT=2                    # seconds
-PING_WARN_MS=50                  # high-ping threshold in milliseconds
+PING_TIMEOUT=2
+PING_WARN_MS=50
 
-TAILSCALE_TARGET="homeassistant"  # replace with a reachable Tailnet device
-TAILSCALE_TIMEOUT=2               # seconds
+TAILSCALE_TARGET="homeassistant"
+TAILSCALE_TIMEOUT=2
 
-HIGH_UPLOAD_LIMIT_MBPS=5          # alert when upload is over this; 0 disables it
-HIGH_DOWNLOAD_LIMIT_MBPS=20       # alert when download is over this; 0 disables it
-HISTORY_COUNT=3                   # average this many samples
+HIGH_UPLOAD_LIMIT_MBPS=5
+HIGH_DOWNLOAD_LIMIT_MBPS=20
+HISTORY_COUNT=3
 
 # Icons
 ICON_WIFI=" "
@@ -21,26 +21,24 @@ ICON_HIGH_PING="!"
 DOWNLOAD_ICON="↓"
 UPLOAD_ICON="↑"
 
-# Keep rate history and counters between Waybar executions.
+export LC_ALL=C
+
 STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/waybar-network-${UID}"
 STATE_FILE="$STATE_DIR/state"
 HISTORY_FILE="$STATE_DIR/history"
 LOCK_FILE="$STATE_DIR/lock"
 
 mkdir -p "$STATE_DIR"
-chmod 700 "$STATE_DIR" 2>/dev/null || true
+chmod 700 "$STATE_DIR" 2>/dev/null || :
 exec 9>"$LOCK_FILE"
 flock 9
 
-# Keep the history count valid.
-if ! [[ "$HISTORY_COUNT" =~ ^[1-9][0-9]*$ ]]; then
-    HISTORY_COUNT=1
-fi
+[[ "$HISTORY_COUNT" =~ ^[1-9][0-9]*$ ]] || HISTORY_COUNT=1
 
 # Find the interface used to reach the ping target.
 IFACE=$(
     ip -o route get "$PING_TARGET" 2>/dev/null |
-        awk '{for (i = 1; i <= NF; i++) if ($i == "dev") {print $(i + 1); exit}}'
+        awk '{ for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit } }'
 )
 
 CLASS="connected"
@@ -52,19 +50,15 @@ UPLOAD_RATE="0.00"
 if [[ -z "$IFACE" ]]; then
     CLASS="no-internet"
 else
-    # Ask NetworkManager for the connection type when available.
     if command -v nmcli >/dev/null 2>&1; then
-        DEVICE_TYPE=$(nmcli -g GENERAL.TYPE device show "$IFACE" 2>/dev/null || true)
+        DEVICE_TYPE=$(nmcli -g GENERAL.TYPE device show "$IFACE" 2>/dev/null || :)
     fi
 
-    # Ping once to check internet reachability and measure latency.
     if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
         LATENCY=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
-
-        # Handle iputils output such as "time<1".
         [[ -n "$LATENCY" ]] || LATENCY="0.5"
-        PING_DETAIL="Reachable (${LATENCY} ms)"
 
+        PING_DETAIL="Reachable (${LATENCY} ms)"
         if awk -v ms="$LATENCY" -v limit="$PING_WARN_MS" \
             'BEGIN { exit !(ms >= limit) }'; then
             CLASS="high-ping"
@@ -72,33 +66,27 @@ else
         fi
     else
         CLASS="no-internet"
-        PING_DETAIL="Unreachable"
     fi
 fi
 
-# Read the interface's received and transmitted byte counters.
+# Read received/transmitted byte counters for an interface.
 read_counters() {
-    awk -v interface="$1" '
-        $1 == interface ":" {
-            print $2, $10
-            found = 1
-        }
-        END {
-            if (!found) print "0 0"
-        }
+    awk -v iface="$1" '
+        $1 == iface ":" { print $2, $10; found = 1 }
+        END { if (!found) print "0 0" }
     ' /proc/net/dev
 }
 
-read -r OLD_IFACE OLD_RX OLD_TX OLD_TIME < "$STATE_FILE" 2>/dev/null || true
-read -r NEW_RX NEW_TX <<< "$(read_counters "$IFACE")"
+read -r OLD_IFACE OLD_RX OLD_TX OLD_TIME < "$STATE_FILE" 2>/dev/null || :
+read -r NEW_RX NEW_TX <<<"$(read_counters "$IFACE")"
 NOW_NS=$(date +%s%N)
 
-# Reset the rate history if the active interface changed.
+# Reset rate history when the active interface changes or disappears.
 if [[ -z "$IFACE" || "$OLD_IFACE" != "$IFACE" ]]; then
     : > "$HISTORY_FILE"
 fi
 
-# Calculate Mbps since the previous script run.
+# Calculate Mbps since the previous run.
 if [[ -n "$IFACE" &&
       "$OLD_IFACE" == "$IFACE" &&
       "$OLD_RX" =~ ^[0-9]+$ &&
@@ -110,23 +98,22 @@ if [[ -n "$IFACE" &&
    (( NEW_RX >= OLD_RX && NEW_TX >= OLD_TX && NOW_NS > OLD_TIME )); then
 
     ELAPSED_NS=$((NOW_NS - OLD_TIME))
-    RX_BYTES=$((NEW_RX - OLD_RX))
-    TX_BYTES=$((NEW_TX - OLD_TX))
-
-    DOWNLOAD_RATE=$(awk -v bytes="$RX_BYTES" -v ns="$ELAPSED_NS" \
+    DOWNLOAD_RATE=$(awk -v bytes="$((NEW_RX - OLD_RX))" -v ns="$ELAPSED_NS" \
         'BEGIN { printf "%.2f", bytes * 8000 / ns }')
-    UPLOAD_RATE=$(awk -v bytes="$TX_BYTES" -v ns="$ELAPSED_NS" \
+    UPLOAD_RATE=$(awk -v bytes="$((NEW_TX - OLD_TX))" -v ns="$ELAPSED_NS" \
         'BEGIN { printf "%.2f", bytes * 8000 / ns }')
 fi
 
 # Save counters and timestamp for the next run.
-printf '%s %s %s %s\n' "$IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_FILE"
+STATE_TMP="${STATE_FILE}.tmp"
+printf '%s %s %s %s\n' "$IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_TMP"
+mv "$STATE_TMP" "$STATE_FILE"
 
-# Keep and average the most recent download/upload samples.
+# Average the most recent download/upload samples.
 if [[ -n "$IFACE" ]]; then
     HISTORY_TMP="${HISTORY_FILE}.tmp"
     {
-        tail -n "$((HISTORY_COUNT - 1))" "$HISTORY_FILE" 2>/dev/null || true
+        tail -n "$((HISTORY_COUNT - 1))" "$HISTORY_FILE" 2>/dev/null || :
         printf '%s %s\n' "$DOWNLOAD_RATE" "$UPLOAD_RATE"
     } > "$HISTORY_TMP"
     mv "$HISTORY_TMP" "$HISTORY_FILE"
@@ -135,10 +122,8 @@ if [[ -n "$IFACE" ]]; then
         awk '
             { download += $1; upload += $2; count++ }
             END {
-                if (count > 0)
-                    printf "%.2f %.2f\n", download / count, upload / count
-                else
-                    print "0.00 0.00"
+                if (count) printf "%.2f %.2f\n", download / count, upload / count
+                else print "0.00 0.00"
             }
         ' "$HISTORY_FILE"
     )
@@ -147,22 +132,19 @@ else
     UPLOAD_RATE="0.00"
 fi
 
-# Select the connection-type icon.
+# Format speed: under 1 Mbps = 2 decimals; under 10 = 1; 10+ = 0.
 format_speed() {
     awk -v speed="$1" 'BEGIN {
-        if (speed < 1) {
-            printf "%.2f", speed
-        } else if (speed < 10) {
-            printf "%.1f", speed
-        } else {
-            printf "%.0f", speed
-        }
+        if (speed < 1) printf "%.2f", speed
+        else if (speed < 10) printf "%.1f", speed
+        else printf "%.0f", speed
     }'
 }
 
 DOWNLOAD_RATE_DISPLAY=$(format_speed "$DOWNLOAD_RATE")
 UPLOAD_RATE_DISPLAY=$(format_speed "$UPLOAD_RATE")
 
+# Select the connection-type icon.
 case "$DEVICE_TYPE" in
     *wifi*|*wireless*)
         NET_ICON="$ICON_WIFI"
@@ -188,12 +170,12 @@ VPN_DETAIL="Tailscale disconnected"
 
 if command -v tailscale >/dev/null 2>&1; then
     if [[ -n "$TAILSCALE_TARGET" ]] &&
-        tailscale ping -c 1 -t "$TAILSCALE_TIMEOUT" "$TAILSCALE_TARGET" \
-            >/dev/null 2>&1; then
+       tailscale ping --c=1 --timeout="${TAILSCALE_TIMEOUT}s" "$TAILSCALE_TARGET" \
+           >/dev/null 2>&1; then
         VPN_CONNECTED=1
         VPN_DETAIL="Tailscale connected"
     else
-        TS_STATUS=$(tailscale status --json 2>/dev/null || true)
+        TS_STATUS=$(tailscale status --json 2>/dev/null || :)
         if jq -e '.Self.Online == true' >/dev/null 2>&1 <<<"$TS_STATUS"; then
             VPN_CONNECTED=1
             VPN_DETAIL="Tailscale online; Tailnet host did not respond"
@@ -201,7 +183,7 @@ if command -v tailscale >/dev/null 2>&1; then
     fi
 fi
 
-# Build the visible text. When internet is down, show only the disconnected icon.
+# Build the visible text.
 if [[ "$CLASS" == "no-internet" ]]; then
     TEXT="$ICON_DISCONNECTED"
     CLASS="disconnected"
@@ -216,25 +198,24 @@ else
         TEXT="${ICON_HIGH_PING} ${TEXT}"
     fi
 
-    # Add a speed alert only when the measured average is over its limit.
+    # Compare unrounded rates to the limits, but display formatted rates.
     if awk -v rate="$UPLOAD_RATE" -v limit="$HIGH_UPLOAD_LIMIT_MBPS" \
         'BEGIN { exit !(limit > 0 && rate > limit) }'; then
-        TEXT+=" ${UPLOAD_ICON} ${UPLOAD_RATE} Mbps"
+        TEXT+=" ${UPLOAD_ICON} ${UPLOAD_RATE_DISPLAY} Mbps"
     fi
 
     if awk -v rate="$DOWNLOAD_RATE" -v limit="$HIGH_DOWNLOAD_LIMIT_MBPS" \
         'BEGIN { exit !(limit > 0 && rate > limit) }'; then
-        TEXT+=" ${DOWNLOAD_ICON} ${DOWNLOAD_RATE} Mbps"
+        TEXT+=" ${DOWNLOAD_ICON} ${DOWNLOAD_RATE_DISPLAY} Mbps"
     fi
-
 fi
 
 TOOLTIP=$(printf \
     'Interface: %s\nInternet ping: %s\nUpload:   %s %s Mbps\nDownload: %s %s Mbps\nVPN: %s' \
     "${IFACE:-none}" \
     "$PING_DETAIL" \
-    "$UPLOAD_ICON" "$UPLOAD_RATE" \
-    "$DOWNLOAD_ICON" "$DOWNLOAD_RATE" \
+    "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
+    "$DOWNLOAD_ICON" "$DOWNLOAD_RATE_DISPLAY" \
     "$VPN_DETAIL")
 
 # Waybar custom module JSON output.
