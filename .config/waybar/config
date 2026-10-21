@@ -4,9 +4,7 @@
   "modules-left": [
     "clock",
     "custom/memory",
-    "custom/cpu",
-    "custom/network-down",
-    "custom/network-up"
+    "custom/cpu"
   ],
   "modules-center": [
     "ext/workspaces"
@@ -88,24 +86,10 @@
   },
   "custom/network-status": {
     "exec": "~/.config/waybar/scripts/network.sh",
-    "interval": 5,
+    "interval": 1,
     "return-type": "json",
     "format": "{}",
     "on-click": "kitty nmtui"
-  },
-  "custom/network-down": {
-    "exec": "~/.config/waybar/scripts/network-speed.sh -D -L 20",
-    "interval": 1,
-    "tooltip": "Download - Mbps",
-    "format": "{}",
-    "return-type": "text"
-  },
-  "custom/network-up": {
-    "exec": "~/.config/waybar/scripts/network-speed.sh -U -L 5",
-    "interval": 1,
-    "tooltip": "Upload - Mbps",
-    "format": "{}",
-    "return-type": "text"
   },
   "custom/bluetooth": {
     "exec": "~/.config/waybar/scripts/bluetooth.sh",

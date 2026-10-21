@@ -2,11 +2,15 @@
 
 # Settings
 PING_TARGET="1.1.1.1"
-PING_TIMEOUT=2          # seconds
-PING_WARN_MS=25        # show alert at or above this latency, in milliseconds
+PING_TIMEOUT=2                    # seconds
+PING_WARN_MS=25                  # high-ping threshold in milliseconds
 
 TAILSCALE_TARGET="homeassistant"  # replace with a reachable Tailnet device
-TAILSCALE_TIMEOUT=2     # seconds
+TAILSCALE_TIMEOUT=2               # seconds
+
+HIGH_UPLOAD_LIMIT_MBPS=5          # alert when upload is over this; 0 disables it
+HIGH_DOWNLOAD_LIMIT_MBPS=20       # alert when download is over this; 0 disables it
+HISTORY_COUNT=3                   # average this many samples
 
 # Icons
 ICON_WIFI=" "
@@ -14,6 +18,24 @@ ICON_ETHERNET="󰈀"
 ICON_DISCONNECTED="⚠"
 ICON_VPN="VPN"
 ICON_HIGH_PING="!"
+DOWNLOAD_ICON="↓"
+UPLOAD_ICON="↑"
+
+# Keep rate history and counters between Waybar executions.
+STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/waybar-network-${UID}"
+STATE_FILE="$STATE_DIR/state"
+HISTORY_FILE="$STATE_DIR/history"
+LOCK_FILE="$STATE_DIR/lock"
+
+mkdir -p "$STATE_DIR"
+chmod 700 "$STATE_DIR" 2>/dev/null || true
+exec 9>"$LOCK_FILE"
+flock 9
+
+# Keep the history count valid.
+if ! [[ "$HISTORY_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+    HISTORY_COUNT=1
+fi
 
 # Find the interface used to reach the ping target.
 IFACE=$(
@@ -24,6 +46,8 @@ IFACE=$(
 CLASS="connected"
 PING_DETAIL="Unreachable"
 DEVICE_TYPE=""
+DOWNLOAD_RATE="0.00"
+UPLOAD_RATE="0.00"
 
 if [[ -z "$IFACE" ]]; then
     CLASS="no-internet"
@@ -50,6 +74,77 @@ else
         CLASS="no-internet"
         PING_DETAIL="Unreachable"
     fi
+fi
+
+# Read the interface's received and transmitted byte counters.
+read_counters() {
+    awk -v interface="$1" '
+        $1 == interface ":" {
+            print $2, $10
+            found = 1
+        }
+        END {
+            if (!found) print "0 0"
+        }
+    ' /proc/net/dev
+}
+
+read -r OLD_IFACE OLD_RX OLD_TX OLD_TIME < "$STATE_FILE" 2>/dev/null || true
+read -r NEW_RX NEW_TX <<< "$(read_counters "$IFACE")"
+NOW_NS=$(date +%s%N)
+
+# Reset the rate history if the active interface changed.
+if [[ -z "$IFACE" || "$OLD_IFACE" != "$IFACE" ]]; then
+    : > "$HISTORY_FILE"
+fi
+
+# Calculate Mbps since the previous script run.
+if [[ -n "$IFACE" &&
+      "$OLD_IFACE" == "$IFACE" &&
+      "$OLD_RX" =~ ^[0-9]+$ &&
+      "$OLD_TX" =~ ^[0-9]+$ &&
+      "$OLD_TIME" =~ ^[0-9]+$ &&
+      "$NEW_RX" =~ ^[0-9]+$ &&
+      "$NEW_TX" =~ ^[0-9]+$ &&
+      "$NOW_NS" =~ ^[0-9]+$ ]] &&
+   (( NEW_RX >= OLD_RX && NEW_TX >= OLD_TX && NOW_NS > OLD_TIME )); then
+
+    ELAPSED_NS=$((NOW_NS - OLD_TIME))
+    RX_BYTES=$((NEW_RX - OLD_RX))
+    TX_BYTES=$((NEW_TX - OLD_TX))
+
+    DOWNLOAD_RATE=$(awk -v bytes="$RX_BYTES" -v ns="$ELAPSED_NS" \
+        'BEGIN { printf "%.2f", bytes * 8000 / ns }')
+    UPLOAD_RATE=$(awk -v bytes="$TX_BYTES" -v ns="$ELAPSED_NS" \
+        'BEGIN { printf "%.2f", bytes * 8000 / ns }')
+fi
+
+# Save counters and timestamp for the next run.
+printf '%s %s %s %s\n' "$IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_FILE"
+
+# Keep and average the most recent download/upload samples.
+if [[ -n "$IFACE" ]]; then
+    HISTORY_TMP="${HISTORY_FILE}.tmp"
+    {
+        tail -n "$((HISTORY_COUNT - 1))" "$HISTORY_FILE" 2>/dev/null || true
+        printf '%s %s\n' "$DOWNLOAD_RATE" "$UPLOAD_RATE"
+    } > "$HISTORY_TMP"
+    mv "$HISTORY_TMP" "$HISTORY_FILE"
+
+    read -r DOWNLOAD_RATE UPLOAD_RATE < <(
+        awk '
+            { download += $1; upload += $2; count++ }
+            END {
+                if (count > 0)
+                    printf "%.2f %.2f\n", download / count, upload / count
+                else
+                    print "0.00 0.00"
+            }
+        ' "$HISTORY_FILE"
+    )
+else
+    DOWNLOAD_RATE="0.00"
+    UPLOAD_RATE="0.00"
 fi
 
 # Select the connection-type icon.
@@ -91,7 +186,7 @@ if command -v tailscale >/dev/null 2>&1; then
     fi
 fi
 
-# Build the visible text. If internet is down, show only the disconnected icon.
+# Build the visible text. When internet is down, show only the disconnected icon.
 if [[ "$CLASS" == "no-internet" ]]; then
     TEXT="$ICON_DISCONNECTED"
     CLASS="disconnected"
@@ -105,10 +200,27 @@ else
     if [[ "$CLASS" == "high-ping" ]]; then
         TEXT="${ICON_HIGH_PING} ${TEXT}"
     fi
+
+    # Add a speed alert only when the measured average is over its limit.
+    if awk -v rate="$UPLOAD_RATE" -v limit="$HIGH_UPLOAD_LIMIT_MBPS" \
+        'BEGIN { exit !(limit > 0 && rate > limit) }'; then
+        TEXT+=" ${UPLOAD_ICON} ${UPLOAD_RATE} Mbps"
+    fi
+
+    if awk -v rate="$DOWNLOAD_RATE" -v limit="$HIGH_DOWNLOAD_LIMIT_MBPS" \
+        'BEGIN { exit !(limit > 0 && rate > limit) }'; then
+        TEXT+=" ${DOWNLOAD_ICON} ${DOWNLOAD_RATE} Mbps"
+    fi
+
 fi
 
-TOOLTIP=$(printf 'Interface: %s\nInternet ping: %s\nVPN: %s' \
-    "${IFACE:-none}" "$PING_DETAIL" "$VPN_DETAIL")
+TOOLTIP=$(printf \
+    'Interface: %s\nInternet ping: %s\nDownload: %s %s Mbps\nUpload: %s %s Mbps\nVPN: %s' \
+    "${IFACE:-none}" \
+    "$PING_DETAIL" \
+    "$DOWNLOAD_ICON" "$DOWNLOAD_RATE" \
+    "$UPLOAD_ICON" "$UPLOAD_RATE" \
+    "$VPN_DETAIL")
 
 # Waybar custom module JSON output.
 jq -cn \
