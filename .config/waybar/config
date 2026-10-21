@@ -15,8 +15,7 @@
     "tray",
     "pulseaudio",
     "custom/bluetooth",
-    "custom/tailscale",
-    "network",
+    "custom/network-status",
     "battery"
   ],
   "clock": {
@@ -87,12 +86,12 @@
     "format-icons": ["", "", "", "", ""],
     "tooltip-format": "{time}"
   },
-  "custom/tailscale": {
-    "exec": "~/.config/waybar/scripts/tailscale-status.sh",
-    "interval": 10,
-    "tooltip": "Tailscale VPN status",
+  "custom/network-status": {
+    "exec": "~/.config/waybar/scripts/network.sh",
+    "interval": 5,
+    "return-type": "json",
     "format": "{}",
-    "return-type": "text"
+    "on-click": "kitty nmtui"
   },
   "custom/network-down": {
     "exec": "~/.config/waybar/scripts/network-speed.sh -D -L 20",
@@ -129,14 +128,6 @@
     "tooltip": "Memory usage",
     "format": "{}",
     "return-type": "text"
-  },
-  "network": {
-    "format-wifi": " ",
-    "format-ethernet": "Eth",
-    "tooltip-format": "{ifname} via {gwaddr}",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "Disconnected ⚠",
-    "on-click": "kitty nmtui"
   },
   "pulseaudio": {
     "format": "{icon}",
