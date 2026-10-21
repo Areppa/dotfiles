@@ -230,11 +230,11 @@ else
 fi
 
 TOOLTIP=$(printf \
-    'Interface: %s\nInternet ping: %s\nDownload: %s %s Mbps\nUpload: %s %s Mbps\nVPN: %s' \
+    'Interface: %s\nInternet ping: %s\nUpload:   %s %s Mbps\nDownload: %s %s Mbps\nVPN: %s' \
     "${IFACE:-none}" \
     "$PING_DETAIL" \
-    "$DOWNLOAD_ICON" "$DOWNLOAD_RATE" \
     "$UPLOAD_ICON" "$UPLOAD_RATE" \
+    "$DOWNLOAD_ICON" "$DOWNLOAD_RATE" \
     "$VPN_DETAIL")
 
 # Waybar custom module JSON output.
