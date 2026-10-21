@@ -95,14 +95,14 @@
     "return-type": "text"
   },
   "custom/network-down": {
-    "exec": "~/.config/waybar/scripts/network.sh -D -L 20",
+    "exec": "~/.config/waybar/scripts/network-speed.sh -D -L 20",
     "interval": 1,
     "tooltip": "Download - Mbps",
     "format": "{}",
     "return-type": "text"
   },
   "custom/network-up": {
-    "exec": "~/.config/waybar/scripts/network.sh -U -L 5",
+    "exec": "~/.config/waybar/scripts/network-speed.sh -U -L 5",
     "interval": 1,
     "tooltip": "Upload - Mbps",
     "format": "{}",
