@@ -3,7 +3,7 @@
 # Settings
 PING_TARGET="1.1.1.1"
 PING_TIMEOUT=2                    # seconds
-PING_WARN_MS=25                  # high-ping threshold in milliseconds
+PING_WARN_MS=50                  # high-ping threshold in milliseconds
 
 TAILSCALE_TARGET="homeassistant"  # replace with a reachable Tailnet device
 TAILSCALE_TIMEOUT=2               # seconds
