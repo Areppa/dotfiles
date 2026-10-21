@@ -148,6 +148,21 @@ else
 fi
 
 # Select the connection-type icon.
+format_speed() {
+    awk -v speed="$1" 'BEGIN {
+        if (speed < 1) {
+            printf "%.2f", speed
+        } else if (speed < 10) {
+            printf "%.1f", speed
+        } else {
+            printf "%.0f", speed
+        }
+    }'
+}
+
+DOWNLOAD_RATE_DISPLAY=$(format_speed "$DOWNLOAD_RATE")
+UPLOAD_RATE_DISPLAY=$(format_speed "$UPLOAD_RATE")
+
 case "$DEVICE_TYPE" in
     *wifi*|*wireless*)
         NET_ICON="$ICON_WIFI"
