@@ -273,12 +273,12 @@ if [[ -n "$IFACE" ]]; then
 fi
 [[ -n "$LOCAL_IP" ]] || LOCAL_IP="—"
 
-# Get the Wi-Fi name, current transmit-mode version, and signal rating.
+# Get the Wi-Fi name and signal rating.
 WIFI_TOOLTIP=""
 if [[ -n "$IFACE" && "$NET_ICON" == "$ICON_WIFI" ]]; then
     WIFI_SSID="—"
-    WIFI_VERSION="unknown"
     WIFI_SIGNAL="Unavailable"
+    WIFI_SIGNAL_DBM=""
 
     if command -v iw >/dev/null 2>&1; then
         LINK_INFO=$(iw dev "$IFACE" link 2>/dev/null || :)
@@ -292,35 +292,25 @@ if [[ -n "$IFACE" && "$NET_ICON" == "$ICON_WIFI" ]]; then
         ' <<<"$LINK_INFO")
         [[ -n "$WIFI_SSID" ]] || WIFI_SSID="—"
 
-        TX_BITRATE=$(awk '
-            /^[[:space:]]*tx bitrate:/ {
-                sub(/^[[:space:]]*tx bitrate: /, "")
-                print
-                exit
-            }
-        ' <<<"$LINK_INFO")
-
-        case "$TX_BITRATE" in
-            *EHT*) WIFI_VERSION="7" ;;
-            *HE*)  WIFI_VERSION="6" ;;
-            *VHT*) WIFI_VERSION="5" ;;
-            *HT*)  WIFI_VERSION="4" ;;
-        esac
-
         SIGNAL_DBM=$(awk '/^[[:space:]]*signal:/ { print $2; exit }' <<<"$LINK_INFO")
         if [[ "$SIGNAL_DBM" =~ ^-?[0-9]+([.][0-9]+)?$ ]]; then
             WIFI_SIGNAL=$(awk -v signal="$SIGNAL_DBM" 'BEGIN {
-                if (signal >= -50) quality = "Excellent"
-                else if (signal >= -60) quality = "Good"
-                else if (signal >= -70) quality = "Fair"
-                else quality = "Weak"
-                printf "%s (%s dBm)", quality, signal
+                if (signal >= -50) print "Excellent"
+                else if (signal >= -60) print "Good"
+                else if (signal >= -70) print "Fair"
+                else print "Weak"
             }')
+            WIFI_SIGNAL_DBM="$SIGNAL_DBM"
         fi
     fi
 
-    WIFI_TOOLTIP=$(printf 'WiFi %s: %s - Signal %s' \
-        "$WIFI_VERSION" "$WIFI_SSID" "$WIFI_SIGNAL")
+    if [[ -n "$WIFI_SIGNAL_DBM" ]]; then
+        WIFI_TOOLTIP=$(printf 'WiFi: %s - %s signal (%s dBm)' \
+            "$WIFI_SSID" "$WIFI_SIGNAL" "$WIFI_SIGNAL_DBM")
+    else
+        WIFI_TOOLTIP=$(printf 'WiFi: %s - %s signal' \
+            "$WIFI_SSID" "$WIFI_SIGNAL")
+    fi
 fi
 
 
