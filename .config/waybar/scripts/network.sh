@@ -5,9 +5,7 @@ PING_TARGET="1.1.1.1"
 PING_TIMEOUT=2
 PING_WARN_MS=50
 VPN_PING_WARN_MS=100
-
 TAILSCALE_TIMEOUT=2
-
 HIGH_UPLOAD_LIMIT_MBPS=5
 HIGH_DOWNLOAD_LIMIT_MBPS=20
 HISTORY_COUNT=3
@@ -41,7 +39,7 @@ ROUTE_IFACE=$(
         awk '{ for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit } }'
 )
 
-# Find the physical interface, preferring a connected Wi-Fi or Ethernet device.
+# Find the physical interface, preferring connected Wi-Fi or Ethernet.
 IFACE=""
 if command -v nmcli >/dev/null 2>&1; then
     IFACE=$(
@@ -90,7 +88,6 @@ else
     if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
         PING_MS=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
         [[ -n "$PING_MS" ]] || PING_MS="0.5"
-
         PING_DETAIL="${PING_MS} ms"
         PING_REACHABLE=1
     fi
@@ -172,7 +169,7 @@ format_speed() {
 DOWNLOAD_RATE_DISPLAY=$(format_speed "$DOWNLOAD_RATE")
 UPLOAD_RATE_DISPLAY=$(format_speed "$UPLOAD_RATE")
 
-# Check Tailscale and ping the currently selected exit node.
+# Check Tailscale and ping the selected exit node.
 VPN_CONNECTED=0
 VPN_DETAIL="Disconnected"
 TS_STATUS=""
@@ -184,7 +181,6 @@ if command -v tailscale >/dev/null 2>&1; then
     EXIT_NODE_ID=$(jq -r '.ExitNodeStatus.ID // empty' <<<"$TS_STATUS")
 
     if [[ -n "$EXIT_NODE_ID" ]]; then
-        # Prefer the selected peer's Tailscale IP; fall back to ExitNodeStatus.
         TAILSCALE_TARGET=$(
             jq -r --arg exit_id "$EXIT_NODE_ID" '
                 (
@@ -204,7 +200,6 @@ if command -v tailscale >/dev/null 2>&1; then
         fi
     fi
 
-    # Preserve the behavior when Tailscale is online but no exit node is selected.
     if (( ! VPN_CONNECTED )) &&
        jq -e '.Self.Online == true' >/dev/null 2>&1 <<<"$TS_STATUS"; then
         VPN_CONNECTED=1
@@ -223,8 +218,8 @@ if command -v tailscale >/dev/null 2>&1; then
             )
 
             [[ -n "$EXIT_NODE_NAME" ]] || EXIT_NODE_NAME="$TAILSCALE_TARGET"
-
             EXIT_NODE_ONLINE=$(jq -r '.ExitNodeStatus.Online // false' <<<"$TS_STATUS")
+
             if [[ "$EXIT_NODE_ONLINE" == "true" ]]; then
                 VPN_DETAIL="Connected (${EXIT_NODE_NAME})"
             else
@@ -268,6 +263,67 @@ case "$DEVICE_TYPE" in
         ;;
 esac
 
+# Get the local IPv4 address for the selected interface.
+LOCAL_IP=""
+if [[ -n "$IFACE" ]]; then
+    LOCAL_IP=$(
+        ip -o -4 addr show dev "$IFACE" scope global 2>/dev/null |
+            awk 'NR == 1 { split($4, address, "/"); print address[1]; exit }'
+    )
+fi
+[[ -n "$LOCAL_IP" ]] || LOCAL_IP="—"
+
+# Get the Wi-Fi name, current transmit-mode version, and signal rating.
+WIFI_TOOLTIP=""
+if [[ -n "$IFACE" && "$NET_ICON" == "$ICON_WIFI" ]]; then
+    WIFI_SSID="—"
+    WIFI_VERSION="unknown"
+    WIFI_SIGNAL="Unavailable"
+
+    if command -v iw >/dev/null 2>&1; then
+        LINK_INFO=$(iw dev "$IFACE" link 2>/dev/null || :)
+
+        WIFI_SSID=$(awk '
+            /^[[:space:]]*SSID: / {
+                sub(/^[[:space:]]*SSID: /, "")
+                print
+                exit
+            }
+        ' <<<"$LINK_INFO")
+        [[ -n "$WIFI_SSID" ]] || WIFI_SSID="—"
+
+        TX_BITRATE=$(awk '
+            /^[[:space:]]*tx bitrate:/ {
+                sub(/^[[:space:]]*tx bitrate: /, "")
+                print
+                exit
+            }
+        ' <<<"$LINK_INFO")
+
+        case "$TX_BITRATE" in
+            *EHT*) WIFI_VERSION="7" ;;
+            *HE*)  WIFI_VERSION="6" ;;
+            *VHT*) WIFI_VERSION="5" ;;
+            *HT*)  WIFI_VERSION="4" ;;
+        esac
+
+        SIGNAL_DBM=$(awk '/^[[:space:]]*signal:/ { print $2; exit }' <<<"$LINK_INFO")
+        if [[ "$SIGNAL_DBM" =~ ^-?[0-9]+([.][0-9]+)?$ ]]; then
+            WIFI_SIGNAL=$(awk -v signal="$SIGNAL_DBM" 'BEGIN {
+                if (signal >= -50) quality = "Excellent"
+                else if (signal >= -60) quality = "Good"
+                else if (signal >= -70) quality = "Fair"
+                else quality = "Weak"
+                printf "%s (%s dBm)", quality, signal
+            }')
+        fi
+    fi
+
+    WIFI_TOOLTIP=$(printf 'WiFi %s: %s - Signal %s' \
+        "$WIFI_VERSION" "$WIFI_SSID" "$WIFI_SIGNAL")
+fi
+
+
 # Build the visible text.
 if [[ "$CLASS" == "no-internet" ]]; then
     TEXT="$ICON_DISCONNECTED"
@@ -296,12 +352,17 @@ else
 fi
 
 TOOLTIP=$(printf \
-    'Interface: %s\nPing: %s\nUpload: %s %s Mbps\nDownload: %s %s Mbps\nTailscale: %s' \
+    'Interface: %s\nLocal IP: %s\nPing: %s\nUpload: %s %s Mbps\nDownload: %s %s Mbps\nTailscale: %s' \
     "${IFACE:-none}" \
+    "$LOCAL_IP" \
     "$PING_DETAIL" \
     "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
     "$DOWNLOAD_ICON" "$DOWNLOAD_RATE_DISPLAY" \
     "$VPN_DETAIL")
+
+if [[ -n "$WIFI_TOOLTIP" ]]; then
+    TOOLTIP+=$'\n'"$WIFI_TOOLTIP"
+fi
 
 # Waybar custom module JSON output.
 jq -cn \
