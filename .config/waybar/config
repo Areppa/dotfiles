@@ -86,7 +86,7 @@
   },
   "custom/network-status": {
     "exec": "~/.config/waybar/scripts/network.sh",
-    "interval": 1,
+    "interval": 3,
     "return-type": "json",
     "format": "{}",
     "on-click": "kitty nmtui"
