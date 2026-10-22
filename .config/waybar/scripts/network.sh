@@ -9,6 +9,7 @@ TAILSCALE_TIMEOUT=2
 HIGH_UPLOAD_LIMIT_MBPS=5
 HIGH_DOWNLOAD_LIMIT_MBPS=20
 HISTORY_COUNT=3
+PING_HISTORY_COUNT=50
 
 # Icons
 ICON_WIFI=" "
@@ -32,6 +33,11 @@ exec 9>"$LOCK_FILE"
 flock 9
 
 [[ "$HISTORY_COUNT" =~ ^[1-9][0-9]*$ ]] || HISTORY_COUNT=1
+[[ "$PING_HISTORY_COUNT" =~ ^[1-9][0-9]*$ ]] || PING_HISTORY_COUNT=1
+
+HISTORY_COUNT=$((10#$HISTORY_COUNT))
+PING_HISTORY_COUNT=$((10#$PING_HISTORY_COUNT))
+HISTORY_KEEP=$(( HISTORY_COUNT > PING_HISTORY_COUNT ? HISTORY_COUNT : PING_HISTORY_COUNT ))
 
 # Find the interface used to reach the ping target. This may be a VPN tunnel.
 ROUTE_IFACE=$(
@@ -73,6 +79,7 @@ fi
 CLASS="connected"
 PING_DETAIL="Unreachable"
 PING_MS=""
+PING_SAMPLE=""
 PING_REACHABLE=0
 DEVICE_TYPE=""
 DOWNLOAD_RATE="0.00"
@@ -89,6 +96,7 @@ else
         PING_MS=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
         [[ -n "$PING_MS" ]] || PING_MS="0.5"
         PING_DETAIL="${PING_MS} ms"
+        PING_SAMPLE="$PING_MS"
         PING_REACHABLE=1
     fi
 fi
@@ -134,21 +142,49 @@ STATE_TMP="${STATE_FILE}.tmp"
 printf '%s %s %s %s\n' "$STATE_IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_TMP"
 mv "$STATE_TMP" "$STATE_FILE"
 
-# Average the most recent download/upload samples.
+# Store speed and ping samples in the same history file.
+PING_AVERAGE="Unavailable"
+
 if [[ -n "$IFACE" ]]; then
     HISTORY_TMP="${HISTORY_FILE}.tmp"
     {
-        tail -n "$((HISTORY_COUNT - 1))" "$HISTORY_FILE" 2>/dev/null || :
-        printf '%s %s\n' "$DOWNLOAD_RATE" "$UPLOAD_RATE"
+        tail -n "$((HISTORY_KEEP - 1))" "$HISTORY_FILE" 2>/dev/null || :
+        printf '%s %s %s\n' "$DOWNLOAD_RATE" "$UPLOAD_RATE" "${PING_SAMPLE:--}"
     } > "$HISTORY_TMP"
     mv "$HISTORY_TMP" "$HISTORY_FILE"
 
     read -r DOWNLOAD_RATE UPLOAD_RATE < <(
-        awk '
-            { download += $1; upload += $2; count++ }
+        awk -v limit="$HISTORY_COUNT" '
+            $1 ~ /^[0-9]+([.][0-9]+)?$/ && $2 ~ /^[0-9]+([.][0-9]+)?$/ {
+                download[++n] = $1
+                upload[n] = $2
+            }
             END {
-                if (count) printf "%.2f %.2f\n", download / count, upload / count
+                start = n - limit + 1
+                if (start < 1) start = 1
+                for (i = start; i <= n; i++) {
+                    d += download[i]
+                    u += upload[i]
+                    count++
+                }
+                if (count) printf "%.2f %.2f\n", d / count, u / count
                 else print "0.00 0.00"
+            }
+        ' "$HISTORY_FILE"
+    )
+
+    PING_AVERAGE=$(
+        awk -v limit="$PING_HISTORY_COUNT" '
+            $3 ~ /^[0-9]+([.][0-9]+)?$/ { ping[++n] = $3 }
+            END {
+                start = n - limit + 1
+                if (start < 1) start = 1
+                for (i = start; i <= n; i++) {
+                    total += ping[i]
+                    count++
+                }
+                if (count) printf "%.2f ms", total / count
+                else print "Unavailable"
             }
         ' "$HISTORY_FILE"
     )
@@ -349,12 +385,13 @@ else
 fi
 
 TOOLTIP=$(printf \
-    'Interface: %s\nLocal IP: %s\nPing: %s\nUpload: %s %s Mbps\nDownload: %s %s Mbps\nTailscale: %s' \
+    'Interface: %s\nLocal IP: %s\n\nPing: %s (avg %s)\n\nDownload: %s %s Mbps\nUpload: %s %s Mbps\n\nTailscale: %s' \
     "${IFACE:-none}" \
     "$LOCAL_IP" \
     "$PING_DETAIL" \
-    "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
+    "$PING_AVERAGE" \
     "$DOWNLOAD_ICON" "$DOWNLOAD_RATE_DISPLAY" \
+    "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
     "$VPN_DETAIL")
 
 if [[ -n "$WIFI_TOOLTIP" ]]; then
