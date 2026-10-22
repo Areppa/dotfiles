@@ -9,7 +9,7 @@ TAILSCALE_TIMEOUT=2
 HIGH_UPLOAD_LIMIT_MBPS=5
 HIGH_DOWNLOAD_LIMIT_MBPS=20
 HISTORY_COUNT=3
-PING_HISTORY_COUNT=50
+PING_HISTORY_COUNT=25
 
 # Icons
 ICON_WIFI=" "
@@ -25,6 +25,7 @@ export LC_ALL=C
 STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/waybar-network-${UID}"
 STATE_FILE="$STATE_DIR/state"
 HISTORY_FILE="$STATE_DIR/history"
+PING_HISTORY_FILE="$STATE_DIR/ping-history"
 LOCK_FILE="$STATE_DIR/lock"
 
 mkdir -p "$STATE_DIR"
@@ -37,7 +38,15 @@ flock 9
 
 HISTORY_COUNT=$((10#$HISTORY_COUNT))
 PING_HISTORY_COUNT=$((10#$PING_HISTORY_COUNT))
-HISTORY_KEEP=$(( HISTORY_COUNT > PING_HISTORY_COUNT ? HISTORY_COUNT : PING_HISTORY_COUNT ))
+
+# Format ping and speed values.
+format_value() {
+    awk -v value="$1" 'BEGIN {
+        if (value < 1) printf "%.2f", value
+        else if (value < 10) printf "%.1f", value
+        else printf "%.0f", value
+    }'
+}
 
 # Find the interface used to reach the ping target. This may be a VPN tunnel.
 ROUTE_IFACE=$(
@@ -95,7 +104,7 @@ else
     if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
         PING_MS=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
         [[ -n "$PING_MS" ]] || PING_MS="0.5"
-        PING_DETAIL="${PING_MS} ms"
+        PING_DETAIL="$(format_value "$PING_MS") ms"
         PING_SAMPLE="$PING_MS"
         PING_REACHABLE=1
     fi
@@ -114,9 +123,10 @@ read -r OLD_IFACE OLD_RX OLD_TX OLD_TIME < "$STATE_FILE" 2>/dev/null || :
 read -r NEW_RX NEW_TX <<<"$(read_counters "$IFACE")"
 NOW_NS=$(date +%s%N)
 
-# Reset rate history when the physical interface changes or is unavailable.
+# Reset rate and ping history when the physical interface changes or is unavailable.
 if [[ -z "$IFACE" || "$OLD_IFACE" != "$STATE_IFACE" ]]; then
     : > "$HISTORY_FILE"
+    : > "$PING_HISTORY_FILE"
 fi
 
 # Calculate Mbps since the previous run.
@@ -142,14 +152,14 @@ STATE_TMP="${STATE_FILE}.tmp"
 printf '%s %s %s %s\n' "$STATE_IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_TMP"
 mv "$STATE_TMP" "$STATE_FILE"
 
-# Store speed and ping samples in the same history file.
 PING_AVERAGE="Unavailable"
 
 if [[ -n "$IFACE" ]]; then
+    # Keep speed samples in their own history file.
     HISTORY_TMP="${HISTORY_FILE}.tmp"
     {
-        tail -n "$((HISTORY_KEEP - 1))" "$HISTORY_FILE" 2>/dev/null || :
-        printf '%s %s %s\n' "$DOWNLOAD_RATE" "$UPLOAD_RATE" "${PING_SAMPLE:--}"
+        tail -n "$((HISTORY_COUNT - 1))" "$HISTORY_FILE" 2>/dev/null || :
+        printf '%s %s\n' "$DOWNLOAD_RATE" "$UPLOAD_RATE"
     } > "$HISTORY_TMP"
     mv "$HISTORY_TMP" "$HISTORY_FILE"
 
@@ -173,9 +183,19 @@ if [[ -n "$IFACE" ]]; then
         ' "$HISTORY_FILE"
     )
 
-    PING_AVERAGE=$(
+    # Keep successful ping samples in their own history file.
+    PING_HISTORY_TMP="${PING_HISTORY_FILE}.tmp"
+    {
+        tail -n "$((PING_HISTORY_COUNT - 1))" "$PING_HISTORY_FILE" 2>/dev/null || :
+        if [[ -n "$PING_SAMPLE" ]]; then
+            printf '%s\n' "$PING_SAMPLE"
+        fi
+    } > "$PING_HISTORY_TMP"
+    mv "$PING_HISTORY_TMP" "$PING_HISTORY_FILE"
+
+    PING_AVERAGE_VALUE=$(
         awk -v limit="$PING_HISTORY_COUNT" '
-            $3 ~ /^[0-9]+([.][0-9]+)?$/ { ping[++n] = $3 }
+            $1 ~ /^[0-9]+([.][0-9]+)?$/ { ping[++n] = $1 }
             END {
                 start = n - limit + 1
                 if (start < 1) start = 1
@@ -183,27 +203,23 @@ if [[ -n "$IFACE" ]]; then
                     total += ping[i]
                     count++
                 }
-                if (count) printf "%.2f ms", total / count
-                else print "Unavailable"
+                if (count) printf "%.17g\n", total / count
             }
-        ' "$HISTORY_FILE"
+        ' "$PING_HISTORY_FILE"
     )
+
+    if [[ -n "$PING_AVERAGE_VALUE" ]]; then
+        PING_AVERAGE="$(format_value "$PING_AVERAGE_VALUE") ms"
+    else
+        PING_AVERAGE="Unavailable"
+    fi
 else
     DOWNLOAD_RATE="0.00"
     UPLOAD_RATE="0.00"
 fi
 
-# Format speed: under 1 Mbps = 2 decimals; under 10 = 1; 10+ = 0.
-format_speed() {
-    awk -v speed="$1" 'BEGIN {
-        if (speed < 1) printf "%.2f", speed
-        else if (speed < 10) printf "%.1f", speed
-        else printf "%.0f", speed
-    }'
-}
-
-DOWNLOAD_RATE_DISPLAY=$(format_speed "$DOWNLOAD_RATE")
-UPLOAD_RATE_DISPLAY=$(format_speed "$UPLOAD_RATE")
+DOWNLOAD_RATE_DISPLAY=$(format_value "$DOWNLOAD_RATE")
+UPLOAD_RATE_DISPLAY=$(format_value "$UPLOAD_RATE")
 
 # Check Tailscale and ping the selected exit node.
 VPN_CONNECTED=0
@@ -267,14 +283,14 @@ if command -v tailscale >/dev/null 2>&1; then
     fi
 fi
 
-# Apply the appropriate high-ping threshold.
-if [[ "$CLASS" != "no-internet" && "$PING_REACHABLE" == "1" ]]; then
+# Apply the appropriate high-ping threshold to the average ping.
+if [[ "$CLASS" != "no-internet" && -n "$PING_AVERAGE_VALUE" ]]; then
     PING_LIMIT="$PING_WARN_MS"
     if (( VPN_CONNECTED )); then
         PING_LIMIT="$VPN_PING_WARN_MS"
     fi
 
-    if awk -v ms="$PING_MS" -v limit="$PING_LIMIT" \
+    if awk -v ms="$PING_AVERAGE_VALUE" -v limit="$PING_LIMIT" \
         'BEGIN { exit !(ms >= limit) }'; then
         CLASS="high-ping"
     fi
