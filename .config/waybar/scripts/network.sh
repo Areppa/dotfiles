@@ -295,12 +295,20 @@ if [[ -n "$IFACE" && "$NET_ICON" == "$ICON_WIFI" ]]; then
         SIGNAL_DBM=$(awk '/^[[:space:]]*signal:/ { print $2; exit }' <<<"$LINK_INFO")
         if [[ "$SIGNAL_DBM" =~ ^-?[0-9]+([.][0-9]+)?$ ]]; then
             WIFI_SIGNAL=$(awk -v signal="$SIGNAL_DBM" 'BEGIN {
-                if (signal >= -50) print "Excellent"
-                else if (signal >= -60) print "Good"
-                else if (signal >= -70) print "Fair"
-                else print "Weak"
+                if (signal >= -50) quality = "Excellent"
+                else if (signal >= -60) quality = "Good"
+                else if (signal >= -70) quality = "Fair"
+                else quality = "Weak"
+                print quality
             }')
             WIFI_SIGNAL_DBM="$SIGNAL_DBM"
+
+            NET_ICON=$(awk -v signal="$SIGNAL_DBM" 'BEGIN {
+                if (signal >= -50)      print "󰤨 "
+                else if (signal >= -60) print "󰤥 "
+                else if (signal >= -70) print "󰤢 "
+                else                    print "󰤟 "
+            }')
         fi
     fi
 
@@ -312,7 +320,6 @@ if [[ -n "$IFACE" && "$NET_ICON" == "$ICON_WIFI" ]]; then
             "$WIFI_SSID" "$WIFI_SIGNAL")
     fi
 fi
-
 
 # Build the visible text.
 if [[ "$CLASS" == "no-internet" ]]; then
