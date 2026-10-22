@@ -4,8 +4,8 @@
 PING_TARGET="1.1.1.1"
 PING_TIMEOUT=2
 PING_WARN_MS=50
+VPN_PING_WARN_MS=100
 
-TAILSCALE_TARGET="homeassistant"
 TAILSCALE_TIMEOUT=2
 
 HIGH_UPLOAD_LIMIT_MBPS=5
@@ -35,37 +35,64 @@ flock 9
 
 [[ "$HISTORY_COUNT" =~ ^[1-9][0-9]*$ ]] || HISTORY_COUNT=1
 
-# Find the interface used to reach the ping target.
-IFACE=$(
+# Find the interface used to reach the ping target. This may be a VPN tunnel.
+ROUTE_IFACE=$(
     ip -o route get "$PING_TARGET" 2>/dev/null |
         awk '{ for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); exit } }'
 )
 
+# Find the physical interface, preferring a connected Wi-Fi or Ethernet device.
+IFACE=""
+if command -v nmcli >/dev/null 2>&1; then
+    IFACE=$(
+        nmcli -t --escape no -f DEVICE,TYPE,STATE device status 2>/dev/null |
+            awk -F: '$3 == "connected" && ($2 == "wifi" || $2 == "ethernet") { print $1; exit }'
+    )
+fi
+
+# Without NetworkManager, prefer a hardware-backed route interface.
+if [[ -z "$IFACE" && -n "$ROUTE_IFACE" ]]; then
+    if [[ -d "/sys/class/net/$ROUTE_IFACE/device" ||
+          -d "/sys/class/net/$ROUTE_IFACE/wireless" ]]; then
+        IFACE="$ROUTE_IFACE"
+    fi
+fi
+
+# If the route uses a tunnel, look for a hardware-backed default-route interface.
+if [[ -z "$IFACE" ]]; then
+    while IFS= read -r candidate; do
+        if [[ -d "/sys/class/net/$candidate/device" ||
+              -d "/sys/class/net/$candidate/wireless" ]]; then
+            IFACE="$candidate"
+            break
+        fi
+    done < <(
+        ip -o route show table main default 2>/dev/null |
+            awk '{ for (i = 1; i <= NF; i++) if ($i == "dev") { print $(i + 1); break } }'
+    )
+fi
+
 CLASS="connected"
 PING_DETAIL="Unreachable"
+PING_MS=""
+PING_REACHABLE=0
 DEVICE_TYPE=""
 DOWNLOAD_RATE="0.00"
 UPLOAD_RATE="0.00"
 
-if [[ -z "$IFACE" ]]; then
+if [[ -z "$ROUTE_IFACE" ]]; then
     CLASS="no-internet"
 else
-    if command -v nmcli >/dev/null 2>&1; then
+    if [[ -n "$IFACE" ]] && command -v nmcli >/dev/null 2>&1; then
         DEVICE_TYPE=$(nmcli -g GENERAL.TYPE device show "$IFACE" 2>/dev/null || :)
     fi
 
     if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
-        LATENCY=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
-        [[ -n "$LATENCY" ]] || LATENCY="0.5"
+        PING_MS=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
+        [[ -n "$PING_MS" ]] || PING_MS="0.5"
 
-        PING_DETAIL="Reachable (${LATENCY} ms)"
-        if awk -v ms="$LATENCY" -v limit="$PING_WARN_MS" \
-            'BEGIN { exit !(ms >= limit) }'; then
-            CLASS="high-ping"
-            PING_DETAIL+=" — HIGH"
-        fi
-    else
-        CLASS="no-internet"
+        PING_DETAIL="${PING_MS} ms"
+        PING_REACHABLE=1
     fi
 fi
 
@@ -77,18 +104,19 @@ read_counters() {
     ' /proc/net/dev
 }
 
+STATE_IFACE="${IFACE:--}"
 read -r OLD_IFACE OLD_RX OLD_TX OLD_TIME < "$STATE_FILE" 2>/dev/null || :
 read -r NEW_RX NEW_TX <<<"$(read_counters "$IFACE")"
 NOW_NS=$(date +%s%N)
 
-# Reset rate history when the active interface changes or disappears.
-if [[ -z "$IFACE" || "$OLD_IFACE" != "$IFACE" ]]; then
+# Reset rate history when the physical interface changes or is unavailable.
+if [[ -z "$IFACE" || "$OLD_IFACE" != "$STATE_IFACE" ]]; then
     : > "$HISTORY_FILE"
 fi
 
 # Calculate Mbps since the previous run.
 if [[ -n "$IFACE" &&
-      "$OLD_IFACE" == "$IFACE" &&
+      "$OLD_IFACE" == "$STATE_IFACE" &&
       "$OLD_RX" =~ ^[0-9]+$ &&
       "$OLD_TX" =~ ^[0-9]+$ &&
       "$OLD_TIME" =~ ^[0-9]+$ &&
@@ -106,7 +134,7 @@ fi
 
 # Save counters and timestamp for the next run.
 STATE_TMP="${STATE_FILE}.tmp"
-printf '%s %s %s %s\n' "$IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_TMP"
+printf '%s %s %s %s\n' "$STATE_IFACE" "$NEW_RX" "$NEW_TX" "$NOW_NS" > "$STATE_TMP"
 mv "$STATE_TMP" "$STATE_FILE"
 
 # Average the most recent download/upload samples.
@@ -144,7 +172,84 @@ format_speed() {
 DOWNLOAD_RATE_DISPLAY=$(format_speed "$DOWNLOAD_RATE")
 UPLOAD_RATE_DISPLAY=$(format_speed "$UPLOAD_RATE")
 
-# Select the connection-type icon.
+# Check Tailscale and ping the currently selected exit node.
+VPN_CONNECTED=0
+VPN_DETAIL="Disconnected"
+TS_STATUS=""
+EXIT_NODE_ID=""
+TAILSCALE_TARGET=""
+
+if command -v tailscale >/dev/null 2>&1; then
+    TS_STATUS=$(tailscale status --json 2>/dev/null || :)
+    EXIT_NODE_ID=$(jq -r '.ExitNodeStatus.ID // empty' <<<"$TS_STATUS")
+
+    if [[ -n "$EXIT_NODE_ID" ]]; then
+        # Prefer the selected peer's Tailscale IP; fall back to ExitNodeStatus.
+        TAILSCALE_TARGET=$(
+            jq -r --arg exit_id "$EXIT_NODE_ID" '
+                (
+                    [.Peer[]?
+                     | select(.ID == $exit_id)
+                     | .TailscaleIPs[0] // empty][0]
+                )
+                // .ExitNodeStatus.TailscaleIPs[0]
+                // empty
+            ' <<<"$TS_STATUS"
+        )
+
+        if [[ -n "$TAILSCALE_TARGET" ]] &&
+           tailscale ping --c=1 --timeout="${TAILSCALE_TIMEOUT}s" "$TAILSCALE_TARGET" \
+               >/dev/null 2>&1; then
+            VPN_CONNECTED=1
+        fi
+    fi
+
+    # Preserve the behavior when Tailscale is online but no exit node is selected.
+    if (( ! VPN_CONNECTED )) &&
+       jq -e '.Self.Online == true' >/dev/null 2>&1 <<<"$TS_STATUS"; then
+        VPN_CONNECTED=1
+    fi
+
+    if (( VPN_CONNECTED )); then
+        if [[ -n "$EXIT_NODE_ID" ]]; then
+            EXIT_NODE_NAME=$(
+                jq -r --arg exit_id "$EXIT_NODE_ID" '
+                    [
+                        .Peer[]?
+                        | select(.ID == $exit_id)
+                        | (.HostName // .DNSName // empty)
+                    ][0] // empty
+                ' <<<"$TS_STATUS"
+            )
+
+            [[ -n "$EXIT_NODE_NAME" ]] || EXIT_NODE_NAME="$TAILSCALE_TARGET"
+
+            EXIT_NODE_ONLINE=$(jq -r '.ExitNodeStatus.Online // false' <<<"$TS_STATUS")
+            if [[ "$EXIT_NODE_ONLINE" == "true" ]]; then
+                VPN_DETAIL="Connected (${EXIT_NODE_NAME})"
+            else
+                VPN_DETAIL="Exit node: ${EXIT_NODE_NAME} (offline)"
+            fi
+        else
+            VPN_DETAIL="Connected (no exit node)"
+        fi
+    fi
+fi
+
+# Apply the appropriate high-ping threshold.
+if [[ "$CLASS" != "no-internet" && "$PING_REACHABLE" == "1" ]]; then
+    PING_LIMIT="$PING_WARN_MS"
+    if (( VPN_CONNECTED )); then
+        PING_LIMIT="$VPN_PING_WARN_MS"
+    fi
+
+    if awk -v ms="$PING_MS" -v limit="$PING_LIMIT" \
+        'BEGIN { exit !(ms >= limit) }'; then
+        CLASS="high-ping"
+    fi
+fi
+
+# Select the physical connection-type icon.
 case "$DEVICE_TYPE" in
     *wifi*|*wireless*)
         NET_ICON="$ICON_WIFI"
@@ -163,26 +268,6 @@ case "$DEVICE_TYPE" in
         ;;
 esac
 
-# Check Tailscale using the configured Tailnet host, then fall back
-# to Tailscale's local daemon status.
-VPN_CONNECTED=0
-VPN_DETAIL="Tailscale disconnected"
-
-if command -v tailscale >/dev/null 2>&1; then
-    if [[ -n "$TAILSCALE_TARGET" ]] &&
-       tailscale ping --c=1 --timeout="${TAILSCALE_TIMEOUT}s" "$TAILSCALE_TARGET" \
-           >/dev/null 2>&1; then
-        VPN_CONNECTED=1
-        VPN_DETAIL="Tailscale connected"
-    else
-        TS_STATUS=$(tailscale status --json 2>/dev/null || :)
-        if jq -e '.Self.Online == true' >/dev/null 2>&1 <<<"$TS_STATUS"; then
-            VPN_CONNECTED=1
-            VPN_DETAIL="Tailscale online; Tailnet host did not respond"
-        fi
-    fi
-fi
-
 # Build the visible text.
 if [[ "$CLASS" == "no-internet" ]]; then
     TEXT="$ICON_DISCONNECTED"
@@ -191,7 +276,7 @@ else
     TEXT="$NET_ICON"
 
     if (( VPN_CONNECTED )); then
-        TEXT+=" ${ICON_VPN} VPN"
+        TEXT+=" ${ICON_VPN}"
     fi
 
     if [[ "$CLASS" == "high-ping" ]]; then
@@ -211,7 +296,7 @@ else
 fi
 
 TOOLTIP=$(printf \
-    'Interface: %s\nInternet ping: %s\nUpload:   %s %s Mbps\nDownload: %s %s Mbps\nVPN: %s' \
+    'Interface: %s\nPing: %s\nUpload: %s %s Mbps\nDownload: %s %s Mbps\nTailscale: %s' \
     "${IFACE:-none}" \
     "$PING_DETAIL" \
     "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
