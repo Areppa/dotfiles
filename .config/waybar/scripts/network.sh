@@ -56,11 +56,16 @@ ROUTE_IFACE=$(
 
 # Find the physical interface, preferring connected Wi-Fi or Ethernet.
 IFACE=""
+DEVICE_TYPE=""
 if command -v nmcli >/dev/null 2>&1; then
-    IFACE=$(
+    NM_DEVICE=$(
         nmcli -t --escape no -f DEVICE,TYPE,STATE device status 2>/dev/null |
-            awk -F: '$3 == "connected" && ($2 == "wifi" || $2 == "ethernet") { print $1; exit }'
+            awk -F: '$3 == "connected" && ($2 == "wifi" || $2 == "ethernet") {
+                print $1, $2
+                exit
+            }'
     )
+    read -r IFACE DEVICE_TYPE <<<"$NM_DEVICE"
 fi
 
 # Without NetworkManager, prefer a hardware-backed route interface.
@@ -89,24 +94,18 @@ CLASS="connected"
 PING_DETAIL="Unreachable"
 PING_MS=""
 PING_SAMPLE=""
-PING_REACHABLE=0
-DEVICE_TYPE=""
+DEVICE_TYPE="${DEVICE_TYPE:-}"
 DOWNLOAD_RATE="0.00"
 UPLOAD_RATE="0.00"
 
 if [[ -z "$ROUTE_IFACE" ]]; then
     CLASS="no-internet"
 else
-    if [[ -n "$IFACE" ]] && command -v nmcli >/dev/null 2>&1; then
-        DEVICE_TYPE=$(nmcli -g GENERAL.TYPE device show "$IFACE" 2>/dev/null || :)
-    fi
-
     if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
         PING_MS=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
         [[ -n "$PING_MS" ]] || PING_MS="0.5"
         PING_DETAIL="$(format_value "$PING_MS") ms"
         PING_SAMPLE="$PING_MS"
-        PING_REACHABLE=1
     fi
 fi
 
