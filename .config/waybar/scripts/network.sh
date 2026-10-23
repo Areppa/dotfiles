@@ -9,7 +9,7 @@ TAILSCALE_TIMEOUT=2
 HIGH_UPLOAD_LIMIT_MBPS=5
 HIGH_DOWNLOAD_LIMIT_MBPS=20
 HISTORY_COUNT=3
-PING_HISTORY_COUNT=25
+PING_HISTORY_COUNT=10
 
 # Icons
 ICON_WIFI=" "
@@ -365,10 +365,10 @@ if [[ -n "$IFACE" && "$NET_ICON" == "$ICON_WIFI" ]]; then
     fi
 
     if [[ -n "$WIFI_SIGNAL_DBM" ]]; then
-        WIFI_TOOLTIP=$(printf 'WiFi: %s - %s signal (%s dBm)' \
+        WIFI_TOOLTIP=$(printf 'WiFi: %s\nSignal: %s %s dBm' \
             "$WIFI_SSID" "$WIFI_SIGNAL" "$WIFI_SIGNAL_DBM")
     else
-        WIFI_TOOLTIP=$(printf 'WiFi: %s - %s signal' \
+        WIFI_TOOLTIP=$(printf 'WiFi: %s\nSignal: %s' \
             "$WIFI_SSID" "$WIFI_SIGNAL")
     fi
 fi
@@ -411,7 +411,7 @@ TOOLTIP=$(printf \
     "$VPN_DETAIL")
 
 if [[ -n "$WIFI_TOOLTIP" ]]; then
-    TOOLTIP+=$'\n'"$WIFI_TOOLTIP"
+    TOOLTIP=$(printf '%s\n\n%s' "$WIFI_TOOLTIP" "$TOOLTIP")
 fi
 
 # Waybar custom module JSON output.
