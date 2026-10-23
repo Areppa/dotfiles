@@ -13,7 +13,7 @@
     "tray",
     "pulseaudio",
     "custom/bluetooth",
-    "custom/network-status",
+    "custom/network",
     "battery"
   ],
   "clock": {
@@ -84,7 +84,7 @@
     "format-icons": ["", "", "", "", ""],
     "tooltip-format": "{time}"
   },
-  "custom/network-status": {
+  "custom/network": {
     "exec": "~/.config/waybar/scripts/network.sh",
     "interval": 3,
     "return-type": "json",
