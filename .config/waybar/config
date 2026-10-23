@@ -11,7 +11,7 @@
   ],
   "modules-right": [
     "tray",
-    "pulseaudio",
+    "custom/audio",
     "custom/bluetooth",
     "custom/network",
     "battery"
@@ -113,13 +113,12 @@
     "format": "{}",
     "return-type": "text"
   },
-  "pulseaudio": {
-    "format": "{icon}",
-    "format-muted": "",
-    "format-icons": {
-      "default": ["", "", " "]
-    },
-    "on-click": "pavucontrol -t 3",
-    "tooltip-format": "{desc} at {volume}%"
+  "custom/audio": {
+    "exec": "~/.config/waybar/scripts/audio.sh",
+    "interval": 1,
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "on-click": "pavucontrol -t 3"
   }
 }
