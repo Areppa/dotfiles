@@ -24,6 +24,11 @@ hl.workspace_rule({
 
 hl.workspace_rule({
     workspace = 5,
+    monitor = "eDP-1",
+})
+
+hl.workspace_rule({
+    workspace = 6,
     monitor = "HDMI-A-1",
 })
 
