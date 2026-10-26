@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Usage: stats-short.sh [-C] [-M]
 # -C  print CPU only
 # -M  print Memory only
 
