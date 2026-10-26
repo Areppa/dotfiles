@@ -1,92 +1,93 @@
 #!/usr/bin/env bash
-# stats-short.sh - compact CPU & RAM for Waybar (icons)
-# Usage: stats-short.sh [-C] [-M] [--cpu-threshold N] [--mem-threshold N]
-#  -C                      print CPU only
-#  -M                      print Memory only
-#  --cpu-threshold N       only show CPU if above N%
-#  --mem-threshold N       only show Memory if above N%
+# Usage: stats-short.sh [-C] [-M]
+# -C  print CPU only
+# -M  print Memory only
 
-print_cpu=false
-print_mem=false
-cpu_threshold=0
-mem_threshold=0
+CPU_THRESHOLD=50
+RAM_THRESHOLD=80
 
-# parse flags
-i=1
+print_cpu=0
+print_mem=0
+
 for arg in "$@"; do
   case "$arg" in
-    -C) print_cpu=true ;;
-    -M) print_mem=true ;;
-    --cpu-threshold)
-      i=$((i + 1))
-      eval "cpu_threshold=\${$i}"
-      ;;
-    --mem-threshold)
-      i=$((i + 1))
-      eval "mem_threshold=\${$i}"
-      ;;
-    *) ;;
+    -C) print_cpu=1 ;;
+    -M) print_mem=1 ;;
   esac
-  i=$((i + 1))
 done
 
-# if no flags given, print both
-if ! $print_cpu && ! $print_mem; then
-  print_cpu=true
-  print_mem=true
+# If no flags are given, print both.
+if (( ! print_cpu && ! print_mem )); then
+  print_cpu=1
+  print_mem=1
 fi
 
-# CPU usage (sample /proc/stat)
 get_cpu() {
-  read -r _ u n s i w irq soft steal _ < /proc/stat
-  total1=$((u + n + s + i + w + irq + soft + steal)); idle1=$i
+  local user nice system idle iowait irq softirq steal
+  local total1 idle1 total2 idle2 dt idt cpu
+
+  read -r _ user nice system idle iowait irq softirq steal _ < /proc/stat
+  total1=$((user + nice + system + idle + iowait + irq + softirq + steal))
+  idle1=$((idle + iowait))
+
   sleep 0.25
-  read -r _ u n s i w irq soft steal _ < /proc/stat
-  total2=$((u + n + s + i + w + irq + soft + steal)); idle2=$i
-  dt=$((total2 - total1)); idt=$((idle2 - idle1))
-  if [ "$dt" -gt 0 ]; then
-    cpu=$(( (100 * (dt - idt)) / dt ))
+
+  read -r _ user nice system idle iowait irq softirq steal _ < /proc/stat
+  total2=$((user + nice + system + idle + iowait + irq + softirq + steal))
+  idle2=$((idle + iowait))
+
+  dt=$((total2 - total1))
+  idt=$((idle2 - idle1))
+
+  if (( dt > 0 )); then
+    cpu=$((100 * (dt - idt) / dt))
   else
     cpu=0
   fi
 
-  # Check threshold
-  if [ "$cpu" -gt "$cpu_threshold" ]; then
-    printf " %d%%" "$cpu"
+  if (( cpu > CPU_THRESHOLD )); then
+    printf ' %d%%' "$cpu"
   fi
 }
 
-# Memory usage (kB)
 get_mem() {
-  mem_total_kb=$(awk '/MemTotal:/ {print $2}' /proc/meminfo)
-  mem_avail_kb=$(awk '/MemAvailable:/ {print $2}' /proc/meminfo)
-  mem_used_kb=$((mem_total_kb - mem_avail_kb))
+  local key value _
+  local mem_total_kb=0 mem_avail_kb=0 mem_used_kb mem_percent whole frac
 
-  # Calculate percentage
+  while read -r key value _; do
+    case "$key" in
+      MemTotal:)     mem_total_kb=$value ;;
+      MemAvailable:) mem_avail_kb=$value ;;
+    esac
+  done < /proc/meminfo
+
+  (( mem_total_kb > 0 )) || return
+
+  mem_used_kb=$((mem_total_kb - mem_avail_kb))
   mem_percent=$((100 * mem_used_kb / mem_total_kb))
 
-  # Check threshold
-  if [ "$mem_percent" -gt "$mem_threshold" ]; then
-    # GiB with one decimal
-    whole=$(( mem_used_kb / 1048576 ))
-    frac=$(( (mem_used_kb % 1048576) * 10 / 1048576 ))
-    printf " %d.%dG" "$whole" "$frac"
+  if (( mem_percent > RAM_THRESHOLD )); then
+    whole=$((mem_used_kb / 1048576))
+    frac=$(((mem_used_kb % 1048576) * 10 / 1048576))
+    printf ' %d.%dG' "$whole" "$frac"
   fi
 }
 
 out=""
-if $print_cpu; then
+
+if (( print_cpu )); then
   out="$(get_cpu)"
 fi
-if $print_mem; then
+
+if (( print_mem )); then
   mem_out="$(get_mem)"
-  if [ -n "$out" ] && [ -n "$mem_out" ]; then
-    out="$out | $mem_out"
-  elif [ -n "$mem_out" ]; then
-    out="$mem_out"
+  if [[ -n $out && -n $mem_out ]]; then
+    out+=" | $mem_out"
+  elif [[ -n $mem_out ]]; then
+    out=$mem_out
   fi
 fi
 
-if [ -n "$out" ]; then
-  printf "%s\n" "$out"
+if [[ -n $out ]]; then
+  printf '%s\n' "$out"
 fi
