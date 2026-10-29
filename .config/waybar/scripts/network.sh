@@ -397,7 +397,13 @@ else
         'BEGIN { exit !(limit > 0 && rate > limit) }'; then
         TEXT+=" ${DOWNLOAD_ICON} ${DOWNLOAD_RATE_DISPLAY} Mbps"
     fi
+
+    # Show the disconnected icon when the ping target is unreachable.
+    if [[ -z "$PING_SAMPLE" ]]; then
+        TEXT="${ICON_DISCONNECTED} ${TEXT}"
+    fi
 fi
+
 
 TOOLTIP=$(printf \
     'Interface: %s\nLocal IP: %s\n\nPing: %s (avg %s)\n\nDownload: %s %s Mbps\nUpload: %s %s Mbps\n\nTailscale: %s' \
