@@ -1,12 +1,20 @@
+@define-color text @theme_fg_color;
+@define-color module_bg @theme_selected_bg_color;
+@define-color workspace_bg alpha(@theme_bg_color, 0.5);
+@define-color workspace_hover @theme_selected_bg_color;
+@define-color tooltip_bg @theme_bg_color;
+@define-color tooltip_text @theme_fg_color;
+
 * {
     font-family:
-        "CaskaydiaCove Nerd Font", "Font Awesome 6 Free",
+        "CaskaydiaCove Nerd Font",
+        "Font Awesome 6 Free",
         "Font Awesome 6 Free Solid";
     font-size: 14px;
     min-height: 0;
     border: none;
     font-weight: bold;
-    color: white;
+    color: @text;
 }
 
 #waybar {
@@ -39,8 +47,7 @@
     border-radius: 10px;
     margin: 6px 3px;
     padding: 6px 12px;
-    background-color: #800080;
-    color: white;
+    background-color: @module_bg;
 }
 
 #clock {
@@ -51,28 +58,22 @@
     margin-right: 10px;
 }
 
-
 #workspaces button {
     all: initial;
     margin: 6px 3px;
     padding: 6px 12px;
     border-radius: 10px;
-    background-color: rgba(36, 36, 52, 0.5);
+    background-color: @workspace_bg;
 }
 
 #workspaces button:hover {
-    background-color: #440044;
+    background-color: @workspace_hover;
 }
 
-tooltip {
+tooltip,
+tooltip label {
     border-radius: 10px;
     padding: 16px;
-    background-color: #131822;
-    color: #c0c0c0;
-}
-
-tooltip label {
-    padding: 5px;
-    background-color: #131822;
-    color: #c0c0c0;
+    background-color: @tooltip_bg;
+    color: @tooltip_text;
 }
