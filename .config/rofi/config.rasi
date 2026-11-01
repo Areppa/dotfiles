@@ -26,7 +26,7 @@ configuration {
 	scroll-method: 0;
 	normalize-match: true;
 	show-icons: true;
-    display-drun: "";
+    display-drun: "🔍";
 	icon-theme: "Papirus";
 /*	cache-dir: ;*/
 	steal-focus: false;
@@ -69,7 +69,7 @@ configuration {
 	/*---------- History and Sorting ----------*/
 	disable-history: false;
 	sorting-method: "normal";
-	max-history-size: 25;
+	max-history-size: 250;
 }
 
 /*****----- Main Window -----*****/
