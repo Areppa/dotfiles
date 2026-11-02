@@ -103,6 +103,15 @@ hl.bind(mainMod .. " + W", hl.dsp.window.close())
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + P", hl.dsp.window.pseudo())
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
+-- Fake fullscreen, the app thinks it is in fullscreen
+hl.bind(mainMod .. " + SHIFT + F", function()
+  local win = hl.get_active_window()
+  hl.dispatch(hl.dsp.window.fullscreen_state({
+    internal = 0,
+    client = win.fullscreen_client,
+    action = "set",
+  }))
+end)
 --hl.bind(mainMod .. " + J", hl.dsp.layout("togglesplit"))
 hl.bind(mainMod .. " + L", hl.dsp.exec_cmd("hyprlock"))
 hl.bind(mainMod .. " + CTRL + SHIFT + M", hl.dsp.exit())
