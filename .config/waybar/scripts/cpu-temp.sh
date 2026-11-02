@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Settings
-MIN_TEMP=50          # Celsius; set to 0 to always show a valid reading
+MIN_TEMP=70          # Celsius; set to 0 to always show a valid reading
 HISTORY_COUNT=5       # Number of measurements to average
 
 STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/waybar-network-${UID}"
