@@ -110,9 +110,8 @@
   "custom/cpu-temp": {
     "exec": "~/.config/waybar/scripts/cpu-temp.sh",
     "interval": 3,
-    "tooltip": "CPU Temp",
-    "format": "{}",
-    "return-type": "text"
+    "return-type": "json",
+    "format": "{}"
   },
   "custom/memory": {
     "exec": "~/.config/waybar/scripts/stats.sh -M",
