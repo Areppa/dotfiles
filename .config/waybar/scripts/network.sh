@@ -16,7 +16,6 @@ ICON_WIFI=" "
 ICON_ETHERNET="󰈀"
 ICON_DISCONNECTED="⚠"
 ICON_VPN="VPN"
-ICON_HIGH_PING="!"
 DOWNLOAD_ICON="↓"
 UPLOAD_ICON="↑"
 
@@ -282,8 +281,11 @@ if command -v tailscale >/dev/null 2>&1; then
     fi
 fi
 
-# Apply the appropriate high-ping threshold to the average ping.
-if [[ "$CLASS" != "no-internet" && -n "$PING_AVERAGE_VALUE" ]]; then
+# Show the ping only when the current ping is unavailable or the average is high.
+PING_DISPLAY=""
+if [[ -z "$PING_SAMPLE" ]]; then
+    PING_DISPLAY="Ping unavailable"
+elif [[ "$CLASS" != "no-internet" && -n "$PING_AVERAGE_VALUE" ]]; then
     PING_LIMIT="$PING_WARN_MS"
     if (( VPN_CONNECTED )); then
         PING_LIMIT="$VPN_PING_WARN_MS"
@@ -292,6 +294,7 @@ if [[ "$CLASS" != "no-internet" && -n "$PING_AVERAGE_VALUE" ]]; then
     if awk -v ms="$PING_AVERAGE_VALUE" -v limit="$PING_LIMIT" \
         'BEGIN { exit !(ms >= limit) }'; then
         CLASS="high-ping"
+        PING_DISPLAY="$PING_AVERAGE"
     fi
 fi
 
@@ -383,10 +386,6 @@ else
         TEXT+=" ${ICON_VPN}"
     fi
 
-    if [[ "$CLASS" == "high-ping" ]]; then
-        TEXT="${ICON_HIGH_PING} ${TEXT}"
-    fi
-
     # Compare unrounded rates to the limits, but display formatted rates.
     if awk -v rate="$UPLOAD_RATE" -v limit="$HIGH_UPLOAD_LIMIT_MBPS" \
         'BEGIN { exit !(limit > 0 && rate > limit) }'; then
@@ -402,6 +401,10 @@ else
     if [[ -z "$PING_SAMPLE" ]]; then
         TEXT="${ICON_DISCONNECTED} ${TEXT}"
     fi
+fi
+
+if [[ -n "$PING_DISPLAY" ]]; then
+    TEXT="${TEXT} | ${PING_DISPLAY}"
 fi
 
 
