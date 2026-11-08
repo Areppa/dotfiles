@@ -42,6 +42,7 @@
 #custom-memory,
 #custom-network,
 #custom-audio,
+#custom-power,
 #custom-bluetooth,
 #workspaces button.active,
 #custom-lock {
@@ -55,7 +56,7 @@
     margin-left: 10px;
 }
 
-#battery {
+#custom-power {
     margin-right: 10px;
 }
 

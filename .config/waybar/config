@@ -15,7 +15,7 @@
     "custom/audio",
     "custom/bluetooth",
     "custom/network",
-    "battery"
+    "custom/power"
   ],
   "clock": {
     "format": "{:%a %d %H:%M}",
@@ -69,28 +69,18 @@
     "active-only": false,
     "format": "{icon}"
   },
-  "battery": {
-    "interval": 5,
-    "states": {
-      "warning": 30,
-      "critical": 15
-    },
-    "format": "<span size='13000' foreground='#a6e3a1'>{icon} </span> {capacity}%",
-    "format-warning": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {capacity}%",
-    "format-critical": "<span size='13000' foreground='#E38C8F'>{icon} </span> {capacity}%",
-    "format-charging": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-plugged": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-alt": "<span size='13000' foreground='#B1E3AD'>{icon} </span> {time}",
-    "format-full": "<span size='13000' foreground='#B1E3AD'> </span>{capacity}%",
-    "format-icons": ["", "", "", "", ""],
-    "tooltip-format": "{time}"
-  },
   "custom/network": {
     "exec": "~/.config/waybar/scripts/network.sh",
     "interval": 3,
     "return-type": "json",
     "format": "{}",
     "on-click": "kitty nmtui"
+  },
+  "custom/power": {
+    "exec": "~/.config/waybar/scripts/power.sh",
+    "interval": 1,
+    "return-type": "json",
+    "format": "{}",
   },
   "custom/bluetooth": {
     "exec": "~/.config/waybar/scripts/bluetooth.sh",
