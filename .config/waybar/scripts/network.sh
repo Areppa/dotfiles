@@ -11,7 +11,7 @@ HIGH_DOWNLOAD_LIMIT_MBPS=20
 HISTORY_COUNT=3
 PING_HISTORY_COUNT=10
 LESS_CHATTY_PING=1
-PING_EVERY_N_TIMES=3
+PING_EVERY_N_TIMES=5
 
 # Icons
 ICON_WIFI=" "
@@ -29,6 +29,7 @@ HISTORY_FILE="$STATE_DIR/history"
 PING_HISTORY_FILE="$STATE_DIR/ping-history"
 PING_COUNTER_FILE="$STATE_DIR/ping-counter"
 PING_RESULT_FILE="$STATE_DIR/ping-result"
+PING_TIMING_FILE="$STATE_DIR/ping-timing"
 LOCK_FILE="$STATE_DIR/lock"
 
 mkdir -p "$STATE_DIR"
@@ -43,6 +44,17 @@ flock 9
 HISTORY_COUNT=$((10#$HISTORY_COUNT))
 PING_HISTORY_COUNT=$((10#$PING_HISTORY_COUNT))
 PING_EVERY_N_TIMES=$((10#$PING_EVERY_N_TIMES))
+
+case "$LESS_CHATTY_PING" in
+    1|true|yes|on)
+        LESS_CHATTY_ACTIVE=1
+        LESS_CHATTY_STATUS="True"
+        ;;
+    *)
+        LESS_CHATTY_ACTIVE=0
+        LESS_CHATTY_STATUS="False"
+        ;;
+esac
 
 # Format ping and speed values.
 format_value() {
@@ -99,11 +111,21 @@ CLASS="connected"
 PING_DETAIL="Unreachable"
 PING_MS=""
 PING_SAMPLE=""
+PING_INTERVAL_SECONDS="Not measured"
 DEVICE_TYPE="${DEVICE_TYPE:-}"
 DOWNLOAD_RATE="0.00"
 UPLOAD_RATE="0.00"
 
-# Ping on every run, or only every Nth run when less-chatty mode is enabled.
+# Load the most recently measured interval between actual ping attempts.
+LAST_PING_TIMESTAMP=""
+LAST_PING_INTERVAL=""
+if read -r LAST_PING_TIMESTAMP LAST_PING_INTERVAL < "$PING_TIMING_FILE" 2>/dev/null; then
+    if [[ "$LAST_PING_INTERVAL" =~ ^[0-9]+$ ]]; then
+        PING_INTERVAL_SECONDS="$LAST_PING_INTERVAL"
+    fi
+fi
+
+# Ping every run, or only every Nth run when less-chatty mode is enabled.
 PING_PROBED=0
 
 if [[ -z "$ROUTE_IFACE" ]]; then
@@ -114,28 +136,40 @@ if [[ -z "$ROUTE_IFACE" ]]; then
 else
     DO_PING=1
 
-    case "$LESS_CHATTY_PING" in
-        1|true|yes|on)
-            read -r PING_COUNT < "$PING_COUNTER_FILE" 2>/dev/null || PING_COUNT=""
-            if [[ ! "$PING_COUNT" =~ ^[0-9]+$ ]]; then
-                # Probe on the first run, then every Nth run.
-                PING_COUNT=$((PING_EVERY_N_TIMES - 1))
-            fi
+    if (( LESS_CHATTY_ACTIVE )); then
+        read -r PING_COUNT < "$PING_COUNTER_FILE" 2>/dev/null || PING_COUNT=""
+        if [[ ! "$PING_COUNT" =~ ^[0-9]+$ ]]; then
+            # Probe on the first run, then every Nth run.
+            PING_COUNT=$((PING_EVERY_N_TIMES - 1))
+        fi
 
-            PING_COUNT=$((PING_COUNT % PING_EVERY_N_TIMES + 1))
-            printf '%s\n' "$PING_COUNT" > "$PING_COUNTER_FILE"
+        PING_COUNT=$((PING_COUNT % PING_EVERY_N_TIMES + 1))
+        printf '%s\n' "$PING_COUNT" > "$PING_COUNTER_FILE"
 
-            DO_PING=0
-            if (( PING_COUNT == PING_EVERY_N_TIMES )) ||
-               [[ ! -r "$PING_RESULT_FILE" ]]; then
-                DO_PING=1
-            fi
-            ;;
-    esac
+        DO_PING=0
+        if (( PING_COUNT == PING_EVERY_N_TIMES )) ||
+           [[ ! -r "$PING_RESULT_FILE" ]]; then
+            DO_PING=1
+        fi
+    fi
 
     if (( DO_PING )); then
         PING_PROBED=1
         PING_SAMPLE=""
+
+        # Measure whole seconds between the starts of ping attempts.
+        PING_NOW=$(date +%s)
+        NEW_PING_INTERVAL="-"
+
+        if [[ "$LAST_PING_TIMESTAMP" =~ ^[0-9]+$ ]] &&
+           (( PING_NOW >= LAST_PING_TIMESTAMP )); then
+            NEW_PING_INTERVAL=$((PING_NOW - LAST_PING_TIMESTAMP))
+            PING_INTERVAL_SECONDS="$NEW_PING_INTERVAL"
+        fi
+
+        printf '%s %s\n' "$PING_NOW" "$NEW_PING_INTERVAL" > "${PING_TIMING_FILE}.tmp"
+        mv "${PING_TIMING_FILE}.tmp" "$PING_TIMING_FILE"
+        LAST_PING_TIMESTAMP="$PING_NOW"
 
         if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
             PING_SAMPLE=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
@@ -456,11 +490,13 @@ if [[ -n "$PING_DISPLAY" ]]; then
 fi
 
 TOOLTIP=$(printf \
-    'Interface: %s\nLocal IP: %s\n\nPing: %s (avg %s)\n\nDownload: %s %s Mbps\nUpload: %s %s Mbps\n\nTailscale: %s' \
+    'Interface: %s\nLocal IP: %s\n\nPing: %s (avg %s)\n\nLess chatty mode: %s\nPing interval: %s s\n\nDownload: %s %s Mbps\nUpload: %s %s Mbps\n\nTailscale: %s' \
     "${IFACE:-none}" \
     "$LOCAL_IP" \
     "$PING_DETAIL" \
     "$PING_AVERAGE" \
+    "$LESS_CHATTY_STATUS" \
+    "$PING_INTERVAL_SECONDS" \
     "$DOWNLOAD_ICON" "$DOWNLOAD_RATE_DISPLAY" \
     "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
     "$VPN_DETAIL")
