@@ -16,7 +16,8 @@ local network_manager = "nmtui"
 local fileManager = os.getenv("HOME") .. "/.local/bin/strata ~"
 local audio_control = "pavucontrol -t 3"
 local browser = "brave-origin"
-local private_browser = "floorp --private-window"
+local private_browser = "brave-origin --incognito"
+local private_browser_alt = "floorp --private-window"
 local tor_browser = "torbrowser-launcher"
 local menu = "ROFI_LIST=true rofi -show drun"
 --local menu = "vicinae open"
@@ -56,6 +57,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd(private_browser))
+hl.bind(mainMod .. " + ALT + SHIFT + N", hl.dsp.exec_cmd(private_browser_alt))
 hl.bind(mainMod .. " + SHIFT + CTRL + N", hl.dsp.exec_cmd(tor_browser))
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd(calculator))
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("flatpak run md.obsidian.Obsidian"))
