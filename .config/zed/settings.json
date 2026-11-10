@@ -7,12 +7,25 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "agent_servers": {
+    "goose": {
+      "default_config_options": {
+        "thinking_effort": "off"
+      },
+      "type": "custom",
+      "command": "goose",
+      "args": ["acp"]
+    }
+  },
   "language_models": {
     "ollama": {
       "api_url": "http://192.168.1.24:11434"
     }
   },
   "agent": {
+    "sandbox_permissions": {
+      "allow_fs_write_all": false
+    },
     "dock": "left",
     "default_model": {
       "provider": "ollama",
