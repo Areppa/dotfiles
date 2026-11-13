@@ -14,8 +14,8 @@
     "tray",
     "custom/audio",
     "custom/bluetooth",
-    "custom/network",
-    "custom/power"
+    "custom/power",
+    "custom/network"
   ],
   "clock": {
     "format": "{:%a %d %H:%M}",
