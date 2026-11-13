@@ -16,6 +16,7 @@ hl.monitor({
 hl.workspace_rule({
     workspace = 1,
     monitor = "DVI-D-1",
+    persistent = true
 })
 
 hl.workspace_rule({
@@ -35,12 +36,13 @@ hl.workspace_rule({
 
 hl.workspace_rule({
     workspace = 5,
-    monitor = "DP-2",
+    monitor = "DVI-D-1",
 })
 
 hl.workspace_rule({
     workspace = 6,
     monitor = "DP-2",
+    persistent = true
 })
 
 hl.workspace_rule({
@@ -62,7 +64,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("spotify", { workspace = "2 silent" })
 
     -- Background apps
-    hl.exec_cmd("flatpak run org.openrgb.OpenRGB --startminimized")
+    --hl.exec_cmd("flatpak run org.openrgb.OpenRGB --startminimized")
     hl.exec_cmd("steam -silent -console")
     hl.exec_cmd("udiskie")
     hl.exec_cmd("/bin/bash -c \"sleep 5 && flatpak run com.github.wwmm.easyeffects -w\"")
