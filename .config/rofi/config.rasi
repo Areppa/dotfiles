@@ -19,7 +19,7 @@
 
 configuration {
 	/*---------- General setting ----------*/
-	modi: "drun,run,calc,emoji:rofimoji";
+	modi: "drun,run,emoji:rofimoji";
 	case-sensitive: false;
 	cycle: true;
 	filter: "";
