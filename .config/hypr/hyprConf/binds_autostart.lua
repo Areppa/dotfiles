@@ -43,7 +43,7 @@ hl.on("hyprland.start", function()
 
     -- Visible apps
     hl.exec_cmd(browser, { workspace = "1 silent" })
-    hl.exec_cmd("flatpak run dev.vencord.Vesktop", { workspace = "2 silent" })
+    hl.exec_cmd("vesktop", { workspace = "2 silent" })
     hl.exec_cmd("flatpak run md.obsidian.Obsidian", { workspace = "3 silent" })
 end)
 
