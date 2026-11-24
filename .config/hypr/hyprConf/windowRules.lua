@@ -23,7 +23,7 @@ hl.window_rule({
 
 hl.window_rule({
     match = {
-        class = "dev.vencord.Vesktop",
+        class = "vesktop",
     },
     workspace = "2",
 })
