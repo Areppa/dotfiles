@@ -26,7 +26,6 @@ STATE_FILE="$STATE_DIR/state"
 HISTORY_FILE="$STATE_DIR/history"
 PING_HISTORY_FILE="$STATE_DIR/ping-history"
 PING_RESULT_FILE="$STATE_DIR/ping-result"
-PING_TIMING_FILE="$STATE_DIR/ping-timing"
 LOCK_FILE="$STATE_DIR/lock"
 
 mkdir -p "$STATE_DIR"
@@ -95,19 +94,9 @@ CLASS="connected"
 PING_DETAIL="Unreachable"
 PING_MS=""
 PING_SAMPLE=""
-PING_INTERVAL_SECONDS="Not measured"
 DEVICE_TYPE="${DEVICE_TYPE:-}"
 DOWNLOAD_RATE="0.00"
 UPLOAD_RATE="0.00"
-
-# Load the most recently measured interval between actual ping attempts.
-LAST_PING_TIMESTAMP=""
-LAST_PING_INTERVAL=""
-if read -r LAST_PING_TIMESTAMP LAST_PING_INTERVAL < "$PING_TIMING_FILE" 2>/dev/null; then
-    if [[ "$LAST_PING_INTERVAL" =~ ^[0-9]+$ ]]; then
-        PING_INTERVAL_SECONDS="$LAST_PING_INTERVAL"
-    fi
-fi
 
 # Ping whenever a route to the target exists.
 PING_PROBED=0
@@ -119,20 +108,6 @@ if [[ -z "$ROUTE_IFACE" ]]; then
 else
     PING_PROBED=1
     PING_SAMPLE=""
-
-    # Measure whole seconds between the starts of ping attempts.
-    PING_NOW=$(date +%s)
-    NEW_PING_INTERVAL="-"
-
-    if [[ "$LAST_PING_TIMESTAMP" =~ ^[0-9]+$ ]] &&
-       (( PING_NOW >= LAST_PING_TIMESTAMP )); then
-        NEW_PING_INTERVAL=$((PING_NOW - LAST_PING_TIMESTAMP))
-        PING_INTERVAL_SECONDS="$NEW_PING_INTERVAL"
-    fi
-
-    printf '%s %s\n' "$PING_NOW" "$NEW_PING_INTERVAL" > "${PING_TIMING_FILE}.tmp"
-    mv "${PING_TIMING_FILE}.tmp" "$PING_TIMING_FILE"
-    LAST_PING_TIMESTAMP="$PING_NOW"
 
     if PING_OUTPUT=$(ping -n -c 1 -W "$PING_TIMEOUT" "$PING_TARGET" 2>&1); then
         PING_SAMPLE=$(sed -nE 's/.*time=([0-9.]+).*/\1/p' <<<"$PING_OUTPUT" | head -n 1)
@@ -444,12 +419,11 @@ if [[ -n "$PING_DISPLAY" ]]; then
 fi
 
 TOOLTIP=$(printf \
-    'Interface: %s\nLocal IP: %s\n\nPing: %s (avg %s)\n\nPing interval: %s s\n\nDownload: %s %s Mbps\nUpload: %s %s Mbps\n\nTailscale: %s' \
+    'Interface: %s\nLocal IP: %s\n\nPing: %s (avg %s)\n\nDownload: %s %s Mbps\nUpload: %s %s Mbps\n\nTailscale: %s' \
     "${IFACE:-none}" \
     "$LOCAL_IP" \
     "$PING_DETAIL" \
     "$PING_AVERAGE" \
-    "$PING_INTERVAL_SECONDS" \
     "$DOWNLOAD_ICON" "$DOWNLOAD_RATE_DISPLAY" \
     "$UPLOAD_ICON" "$UPLOAD_RATE_DISPLAY" \
     "$VPN_DETAIL")
